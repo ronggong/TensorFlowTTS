@@ -14,7 +14,7 @@ int main()
 
 		LOGF("Type a prompt, or type EXIT to exit ");
 
-		getline(cin, Prompt);
+		getline(std::cin, Prompt);
 		if (Prompt == "EXIT") {
 			Running = false;
 			break;

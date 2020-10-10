@@ -26,11 +26,8 @@ std::vector<int32_t> Voice::PhonemesToID(const std::string & InTxt)
 
 		if (VoxUtil::FindInVec<std::string>(Pho, Phonemes, ArrID))
 			VecPhones.push_back(PhonemeIDs[ArrID]);
-		else
-			cout << "Voice::PhonemesToID() WARNING: Unknown phoneme " << Pho << endl;
-
-
-
+		// else
+		//	cout << "Voice::PhonemesToID() WARNING: Unknown phoneme " << Pho << endl;
 	}
 	// Prevent out of range error in single word input
 	if (VecPhones.size() > 1)
@@ -41,7 +38,6 @@ std::vector<int32_t> Voice::PhonemesToID(const std::string & InTxt)
 	else 
 	{
 		VecPhones.push_back(148);
-
 	}
 
 
@@ -53,18 +49,23 @@ Voice::Voice(const std::string & VoxPath)
 {
 	MelPredictor.Initialize(VoxPath + "/melgen");
 	Vocoder.Initialize(VoxPath + "/vocoder");
-	Processor.Initialize(VoxPath + "/g2p.fst");
+	// Processor.Initialize(VoxPath + "/g2p.fst");
 
 }
 
 std::vector<float> Voice::Vocalize(const std::string & Prompt, float Speed, int32_t SpeakerID, float Energy, float F0)
 {
-	cout << Prompt << endl;
+	// cout << Prompt << endl;
 
-	std::string PhoneticTxt = Processor.ProcessTextPhonetic(Prompt);
-	cout << PhoneticTxt << endl;
+	// std::string PhoneticTxt = Processor.ProcessTextPhonetic(Prompt);
+	std::vector<int32_t> vectorid = processor.textToSequence(Prompt);
+	for (auto i: vectorid)
+		std::cout << i << " ";
 
-	TFTensor<float> Mel = MelPredictor.DoInference(PhonemesToID(PhoneticTxt), SpeakerID, Speed, Energy, F0);
+	// std::vector<int32_t> vectorid{ 57, 45, 46, 56, 11, 56, 45, 52, 58, 49, 41, 11, 39, 42, 11, 49, 46, 48, 42, 11, 57, 45, 38, 57, 7, 148 };
+	// PhonemesToID(PhoneticTxt)
+
+	TFTensor<float> Mel = MelPredictor.DoInference(vectorid, SpeakerID, Speed, Energy, F0);
 
 	TFTensor<float> AuData = Vocoder.DoInference(Mel);
 

@@ -2,15 +2,16 @@
 
 #include "FastSpeech2.h"
 #include "MultiBandMelGAN.h"
-#include "EnglishPhoneticProcessor.h"
+// #include "EnglishPhoneticProcessor.h"
+#include "Processor.h"
 
 class Voice
 {
 private:
 	FastSpeech2 MelPredictor;
 	MultiBandMelGAN Vocoder;
-	EnglishPhoneticProcessor Processor;
-
+	// EnglishPhoneticProcessor Processor;
+	Processor processor;
 
 	std::vector<int32_t> PhonemesToID(const std::string& InTxt);
 
