@@ -43,4 +43,6 @@ dump_ljspeech/
 dump_kss/
 dump_libritts/
 /examples/*/*
+!/examples/cppwin/*
+/examples/cppwin/deps/
 /notebooks/test_saved/

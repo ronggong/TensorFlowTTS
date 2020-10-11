@@ -22,10 +22,10 @@ int main()
 		std::vector<float> Audata = LJSpeech.Vocalize(Prompt);
 		
 
-		std::string Filename = Prompt.substr(0, std::min(16, (int)Prompt.size())) + ".wav";
+		// std::string Filename = Prompt.substr(0, std::min(16, (int)Prompt.size())) + ".wav";
 
-		VoxUtil::ExportWAV(Filename, Audata, 22050);
-		LOGF("Saved to " + Filename);
+		// VoxUtil::ExportWAV(Filename, Audata, 22050);
+		// LOGF("Saved to " + Filename);
 		
 
 
