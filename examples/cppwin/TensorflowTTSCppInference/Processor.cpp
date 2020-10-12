@@ -2,38 +2,60 @@
 #include <iostream>
 #include "Processor.h"
 
-const std::vector<std::string> first14 = { "zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven", "twelve", "thirteen", "fourteen" };
-const std::vector<std::string> prefixes = { "twen", "thir", "for", "fif", "six", "seven", "eigh", "nine" };
+const std::vector<std::string> nums{
+	"zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine",
+	"ten", "eleven", "twelve", "thirteen", "fourteen", "fifteen", "sixteen", "seventeen", "eighteen", "nineteen"
+};
 
-std::string IntToStr(int number)
-{
-	if (number < 0)
-	{
-		return "minus " + IntToStr(-number);
+const std::vector<std::string> tens{ "zero", "ten", "twenty", "thirty", "forty", "fifty", "sixty", "seventy", "eighty", "ninety" };
+
+std::string numToStringHelper(long long n) {
+	if (n < 0) {
+		return "negative " + numToStringHelper(-n);
 	}
-	if (number <= 14)
-		return first14.at(number);
-	if (number < 20)
-		return prefixes.at(number - 12) + "teen";
-	if (number < 100) {
-		unsigned int remainder = number - (static_cast<int>(number / 10) * 10);
-		return prefixes.at(number / 10 - 2) + (0 != remainder ? "ty " + IntToStr(remainder) : "ty");
+	long long index = n;
+	std::cout << index << std::endl;
+	if (n <= 19) {
+		return nums[index];
 	}
-	if (number < 1000) {
-		unsigned int remainder = number - (static_cast<int>(number / 100) * 100);
-		return first14.at(number / 100) + (0 != remainder ? " hundred " + IntToStr(remainder) : " hundred");
+	if (n <= 99) {
+		return tens[index / 10] + (n % 10 > 0 ? "-" + numToStringHelper(n % 10) : "");
 	}
-	if (number < 1000000) {
-		unsigned int thousands = static_cast<int>(number / 1000);
-		unsigned int remainder = number - (thousands * 1000);
-		return IntToStr(thousands) + (0 != remainder ? " thousand " + IntToStr(remainder) : " thousand");
+	std::string label;
+	long long factor = 0;
+	if (n <= 999) {
+		label = "hundred";
+		factor = 100;
 	}
-	if (number < 1000000000) {
-		unsigned int millions = static_cast<int>(number / 1000000);
-		unsigned int remainder = number - (millions * 1000000);
-		return IntToStr(millions) + (0 != remainder ? " million " + IntToStr(remainder) : " million");
+	else if (n <= 999999) {
+		label = "thousand";
+		factor = 1000;
 	}
-	throw std::out_of_range("inttostr() value too large");
+	else if (n <= 999999999) {
+		label = "million";
+		factor = 1000000;
+	}
+	else if (n <= 999999999999) {
+		label = "billion";
+		factor = 1000000000;
+	}
+	else if (n <= 999999999999999) {
+		label = "trillion";
+		factor = 1000000000000;
+	}
+	else if (n <= 999999999999999999) {
+		label = "quadrillion";
+		factor = 1000000000000000;
+	}
+	else {
+		label = "quintillion";
+		factor = 1000000000000000000;
+	}
+	return numToStringHelper(n / factor) + " " + label + (n % factor > 0 ? " " + numToStringHelper(n % factor) : "");
+}
+
+std::string numToString(long long n) {
+	return numToStringHelper(n);
 }
 
 void Processor::englishCleaners()
@@ -42,9 +64,8 @@ void Processor::englishCleaners()
 	// std::cout << mText << std::endl;
 
 	lowercase();
-
+	expandAbbreviations();
 	expandNumbers();
-
 	collapseWhitespace();
 
 }
@@ -66,6 +87,9 @@ void Processor::lowercase()
 
 void Processor::expandAbbreviations()
 {
+	for (auto& it : ABBREVIATIONS) {
+		mText = std::regex_replace(mText, std::regex("\\b" + it.first + "\\."), it.second);
+	}
 }
 
 void Processor::expandNumbers()
@@ -117,7 +141,16 @@ void Processor::expandDecimals()
 	}
 
 	for (size_t i = 0; i < strFounds.size(); i++) {
-		strReplace = std::regex_replace(strFounds[i], std::regex("\\."), " point ");
+		std::smatch decimal;
+		std::string decimalSpace;
+		// Find the decimal after point
+		std::regex_search(strFounds[i], decimal, DECIMAL_INT_RE);
+		for (auto c : decimal.str()) {
+			decimalSpace += c;
+			decimalSpace += " ";
+		}
+		strReplace = std::regex_replace(strFounds[i], std::regex(decimal.str()), decimalSpace);
+		strReplace = std::regex_replace(strReplace, std::regex("\\."), " point", std::regex_constants::format_first_only);
 		mText = std::regex_replace(mText, std::regex(strFounds[i]), strReplace, std::regex_constants::format_first_only);
 	}
 }
@@ -136,7 +169,7 @@ void Processor::expandCardinals()
 	}
 
 	for (size_t i = 0; i < strFounds.size(); i++) {
-		mText = std::regex_replace(mText, std::regex(strFounds[i]), IntToStr(stoi(strFounds[i])), std::regex_constants::format_first_only);
+		mText = std::regex_replace(mText, std::regex(strFounds[i]), numToString(stoll(strFounds[i])), std::regex_constants::format_first_only);
 	}
 }
 
@@ -144,12 +177,33 @@ Processor::Processor()
 {
 	COMMA_NUMBER_RE = "[0-9]+\\,+[0-9]+";
 	DECIMAL_NUMBER_RE = "[0-9]+\\.[0-9]+";
+	DECIMAL_INT_RE = "\\.[0-9]+";
 	POUNDS_RE = "£([0-9,]*[0-9]+)";
 	DOLLARS_RE = "\\$([0-9\\.\\,]*[0-9]+)";
 	ORDINAL_RE = "[0-9]+(st|nd|rd|th)";
 	NUMBER_RE = "[0-9]+";
-	
 	WHITESPACE_RE = "\\s+";
+
+	ABBREVIATIONS = {
+		{"mrs", "misess"},
+		{"mr", "mister" },
+		{"dr", "doctor"},
+		{"st", "saint" },
+		{"co", "company"},
+		{"jr", "junior"},
+		{"maj", "major"},
+		{"gen", "general"},
+		{"drs", "doctors"},
+		{"rev", "reverend"},
+		{"lt", "lieutenant"},
+		{"hon", "honorable"},
+		{"sgt", "sergeant"},
+		{"capt", "captain"},
+		{"esq", "esquire"},
+		{"ltd", "limited"},
+		{"col", "colonel"},
+		{"ft", "fort"},
+	};
 
 	for (size_t i = 0; i < PAD.size(); i++) {
 		symbols.push_back(PAD.substr(i, 1));

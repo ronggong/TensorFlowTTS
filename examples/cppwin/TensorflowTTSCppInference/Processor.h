@@ -102,9 +102,11 @@ private:
 
     std::vector<std::string> symbols;
     std::unordered_map<std::string, int32_t> SYMBOL_TO_ID;
+    std::unordered_map<std::string, std::string> ABBREVIATIONS;
 
     std::regex COMMA_NUMBER_RE;
     std::regex DECIMAL_NUMBER_RE;
+    std::regex DECIMAL_INT_RE;
     std::regex POUNDS_RE;
     std::regex DOLLARS_RE;
     std::regex ORDINAL_RE;
