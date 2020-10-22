@@ -124,6 +124,7 @@ private:
 
     void removeCommas();
     void expandDecimals();
+    void expandOrdinals();
     void expandCardinals();
 
 public:
