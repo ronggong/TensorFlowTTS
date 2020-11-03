@@ -50,6 +50,7 @@ Voice::Voice(const std::string & VoxPath)
 	MelPredictor.Initialize(VoxPath + "/melgen");
 	Vocoder.Initialize(VoxPath + "/vocoder");
 	// Processor.Initialize(VoxPath + "/g2p.fst");
+	processor.init(VoxPath + "/g2p.fst");
 
 }
 

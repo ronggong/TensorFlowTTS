@@ -128,7 +128,6 @@ std::string toOrdinal(long long n) {
 void Processor::englishCleaners()
 {
 	// convertToAscii();
-	// std::cout << mText << std::endl;
 
 	lowercase();
 	expandAbbreviations();
@@ -163,10 +162,8 @@ void Processor::expandNumbers()
 {
 	removeCommas();
 	expandDecimals();
-	std::cout << "expandNumbers: " << mText << std::endl;
 	expandOrdinals();
 	expandCardinals();
-	std::cout << "expandNumbers: " << mText << std::endl;
 
 }
 
@@ -262,7 +259,48 @@ void Processor::expandCardinals()
 	}
 }
 
-Processor::Processor()
+void Processor::initSymbolsFS2()
+{
+	for (size_t i = 0; i < PAD.size(); i++) {
+		symbols.push_back(PAD.substr(i, 1));
+	}
+	for (size_t i = 0; i < SPECIAL.size(); i++) {
+		symbols.push_back(SPECIAL.substr(i, 1));
+	}
+	for (size_t i = 0; i < PUNCTUATION.size(); i++) {
+		symbols.push_back(PUNCTUATION.substr(i, 1));
+	}
+	for (size_t i = 0; i < LETTERS.size(); i++) {
+		symbols.push_back(LETTERS.substr(i, 1));
+	}
+	for (size_t i = 0; i < VALID_SYMBOLS.size(); i++) {
+		symbols.push_back("@" + VALID_SYMBOLS[i]);
+	}
+	for (size_t i = 0; i < EOS.size(); i++) {
+		symbols.push_back(EOS.substr(i, 1));
+	}
+	for (size_t i = 0; i < symbols.size(); ++i) {
+		SYMBOL_TO_ID[symbols[i]] = i;
+	}
+}
+
+void Processor::initSymbolsLibritts()
+{
+	for (size_t i = 0; i < VALID_SYMBOLS_LIBRITTS.size(); i++) {
+		symbols.push_back(VALID_SYMBOLS_LIBRITTS[i]);
+	}
+	for (int32_t i = 0; i < symbols.size(); i++) {
+		SYMBOL_TO_ID[symbols[i]] = i + 4;
+	}
+}
+
+void Processor::init(const std::string& VoxPath)
+{
+	g2p.Initialize(VoxPath);
+}
+
+Processor::Processor(bool libritts)
+	: libritts (libritts)
 {
 	COMMA_NUMBER_RE = "[0-9]+\\,+[0-9]+";
 	DECIMAL_NUMBER_RE = "[0-9]+\\.[0-9]+";
@@ -294,27 +332,11 @@ Processor::Processor()
 		{"ft", "fort"},
 	};
 
-
-	for (size_t i = 0; i < PAD.size(); i++) {
-		symbols.push_back(PAD.substr(i, 1));
+	if (libritts) {
+		initSymbolsLibritts();
 	}
-	for (size_t i = 0; i < SPECIAL.size(); i++) {
-		symbols.push_back(SPECIAL.substr(i, 1));
-	}
-	for (size_t i = 0; i < PUNCTUATION.size(); i++) {
-		symbols.push_back(PUNCTUATION.substr(i, 1));
-	}
-	for (size_t i = 0; i < LETTERS.size(); i++) {
-		symbols.push_back(LETTERS.substr(i, 1));
-	}
-	for (size_t i = 0; i < VALID_SYMBOLS.size(); i++) {
-		symbols.push_back("@"+VALID_SYMBOLS[i]);
-	}
-	for (size_t i = 0; i < EOS.size(); i++) {
-		symbols.push_back(EOS.substr(i, 1));
-	}
-	for (int32_t i = 0; i < symbols.size(); ++i) {
-		SYMBOL_TO_ID[symbols[i]] = i;
+	else {
+		initSymbolsFS2();
 	}
 }
 
@@ -325,16 +347,29 @@ Processor::~Processor()
 std::vector<int32_t> Processor::textToSequence(const std::string &text)
 {
 	mText = text;
-	std::cout << mText << std::endl;
 
 	std::vector<int32_t> sequence;
 	if (!mText.empty()) {
 		englishCleaners();
-		std::string textSubstr;
-		for (size_t i = 0; i < mText.size(); i++) {
-			textSubstr = mText.substr(i, 1);
-			if (textSubstr != "_" && textSubstr != "~" && std::find(symbols.begin(), symbols.end(), textSubstr) != symbols.end()) {
-				sequence.push_back(SYMBOL_TO_ID[textSubstr]);
+		if (libritts) {
+			mText = g2p.ProcessTextPhonetic(mText);
+			std::vector<std::string> textSplit = splitString(mText, ' ');
+			if (textSplit[textSplit.size() - 1] != "SIL") {
+				textSplit.push_back("SIL");
+			}
+			textSplit.push_back("END");
+			for (size_t i = 0; i < textSplit.size(); i++) {
+				std::cout << textSplit[i] << std::endl;
+				sequence.push_back(SYMBOL_TO_ID[textSplit[i]]);
+			}
+		}
+		else {
+			std::string textSubstr;
+			for (size_t i = 0; i < mText.size(); i++) {
+				textSubstr = mText.substr(i, 1);
+				if (textSubstr != "_" && textSubstr != "~" && std::find(symbols.begin(), symbols.end(), textSubstr) != symbols.end()) {
+					sequence.push_back(SYMBOL_TO_ID[textSubstr]);
+				}
 			}
 		}
 	}

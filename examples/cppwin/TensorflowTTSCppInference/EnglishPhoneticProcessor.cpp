@@ -14,7 +14,7 @@ bool EnglishPhoneticProcessor::Initialize(const std::string & PhoneticModelFn)
 	return true;
 }
 
-std::string EnglishPhoneticProcessor::ProcessTextPhonetic(const std::string & InText)
+std::string EnglishPhoneticProcessor::ProcessTextPhonetic(const std::string &InText)
 {
 	if (!Phonemizer)
 		return "ERROR";
@@ -29,10 +29,7 @@ std::string EnglishPhoneticProcessor::ProcessTextPhonetic(const std::string & In
 		if (Word == "SIL") {
 			Assemble.append(Word);
 			Assemble.append(" ");
-
-
 			continue;
-
 		}
 
 		vector<PathData> PhResults = Phonemizer->Phoneticize(Word, 1, 10000, 99.f, false, false, 0.99);
@@ -41,19 +38,11 @@ std::string EnglishPhoneticProcessor::ProcessTextPhonetic(const std::string & In
 				Assemble.append(Phonemizer->osyms_->Find(uni));
 				Assemble.append(" ");
 			}
-
-
 		}
-
-
-
-
 	}
 	
 
 	// Delete last space if there is
-
-
 	if (Assemble[Assemble.size() - 1] == ' ')
 		Assemble.pop_back();
 
