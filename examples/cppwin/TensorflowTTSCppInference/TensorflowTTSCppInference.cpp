@@ -7,7 +7,7 @@ int main()
 {
 	bool Running = true;
 	LOGF("Loading voice...");
-	Voice LJSpeech("LJ");
+	Voice LJSpeech("LJ", "English");
 	while (Running) 
 	{
 		std::string Prompt = "";

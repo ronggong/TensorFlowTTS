@@ -54,6 +54,9 @@
     <ClInclude Include="Processor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Phonemizer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="TensorflowTTSCppInference.cpp">
@@ -87,6 +90,9 @@
       <Filter>ext\CppFlow</Filter>
     </ClCompile>
     <ClCompile Include="Processor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Phonemizer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

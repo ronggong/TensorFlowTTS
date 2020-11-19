@@ -6,6 +6,7 @@
 #include <unordered_map>
 #include <algorithm>
 #include "EnglishPhoneticProcessor.h"
+#include "Phonemizer.h"
 
 class Processor {
 private:
@@ -62,10 +63,17 @@ private:
     bool libritts;
 
     EnglishPhoneticProcessor g2p;
+    std::vector<std::string> Phonemes;
+    std::vector<int32_t> PhonemeIDs;
+    std::vector<DictEntry> CurrentDict;
+
+    void ReadPhonemes(const std::string& PhonemePath);
 
 public:
 	Processor(bool libritts=true);
 	~Processor();
-    void init(const std::string& VoxPath);
+    void init(const std::string& VoxPath, 
+        const std::string& lang);
     std::vector<int32_t> textToSequence(const std::string &text);
+    void SetDictEntries(const std::vector<DictEntry>& InEntries);
 };

@@ -4,8 +4,6 @@
 #include <cassert>
 #include <cctype>
 #include <stdexcept>
-const std::vector<std::string> first14 = { "zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven", "twelve", "thirteen", "fourteen" };
-const std::vector<std::string> prefixes = { "twen", "thir", "for", "fif", "six", "seven", "eigh", "nine" };
 
 // Punctuation, this gets auto-converted to SIL
 const std::string punctuation = ",.-;";
@@ -19,72 +17,9 @@ const std::string misc = "'";
 
 using namespace std;
 
-string TextTokenizer::IntToStr(int number)
+void TextTokenizer::SetAllowedChars(const std::string& value)
 {
-	if (number < 0)
-	{
-		return "minus " + IntToStr(-number);
-	}
-	if (number <= 14)
-		return first14.at(number);
-	if (number < 20)
-		return prefixes.at(number - 12) + "teen";
-	if (number < 100) {
-		unsigned int remainder = number - (static_cast<int>(number / 10) * 10);
-		return prefixes.at(number / 10 - 2) + (0 != remainder ? "ty " + IntToStr(remainder) : "ty");
-	}
-	if (number < 1000) {
-		unsigned int remainder = number - (static_cast<int>(number / 100) * 100);
-		return first14.at(number / 100) + (0 != remainder ? " hundred " + IntToStr(remainder) : " hundred");
-	}
-	if (number < 1000000) {
-		unsigned int thousands = static_cast<int>(number / 1000);
-		unsigned int remainder = number - (thousands * 1000);
-		return IntToStr(thousands) + (0 != remainder ? " thousand " + IntToStr(remainder) : " thousand");
-	}
-	if (number < 1000000000) {
-		unsigned int millions = static_cast<int>(number / 1000000);
-		unsigned int remainder = number - (millions * 1000000);
-		return IntToStr(millions) + (0 != remainder ? " million " + IntToStr(remainder) : " million");
-	}
-	throw std::out_of_range("inttostr() value too large");
-}
-
-
-vector<string> TextTokenizer::ExpandNumbers(const std::vector<std::string>& SpaceTokens)
-{
-	vector<string> RetVec;
-	RetVec.reserve(SpaceTokens.size());
-
-	for (auto& Token : SpaceTokens) {
-		char* p;
-		long converted = strtol(Token.c_str(), &p, 10);
-		if (*p) {
-			RetVec.push_back(Token);
-		}
-		else {
-			if (converted > 1000000000)
-				continue;
-
-			string IntStr = IntToStr((int)converted);
-			ZStringDelimiter DelInt(IntStr);
-			DelInt.AddDelimiter(" ");
-
-			std::vector<std::string> NumToks = DelInt.GetTokens();
-
-			// If a number results in one word the delimiter may not add it.
-			if (NumToks.empty())
-				NumToks.push_back(IntStr);
-
-			for (const auto& NumTok : NumToks)
-				RetVec.push_back(NumTok);
-			
-
-		}
-	}
-
-	return RetVec;
-	
+	AllowedChars = value;
 }
 
 TextTokenizer::TextTokenizer()
@@ -95,7 +30,8 @@ TextTokenizer::~TextTokenizer()
 {
 }
 
-vector<string> TextTokenizer::Tokenize(const std::string & InTxt)
+vector<string> TextTokenizer::Tokenize(const std::string & InTxt,
+	ETTSLanguage::Enum Language)
 {
 	vector<string> ProcessedTokens;
 
@@ -107,8 +43,6 @@ vector<string> TextTokenizer::Tokenize(const std::string & InTxt)
 	// Single word handler
 	if (!Delim.szTokens())
 		DelimitedTokens.push_back(InTxt);
-
-	DelimitedTokens = ExpandNumbers(DelimitedTokens);
 
 
 	// We know that the new vector is going to be at least this size so we reserve
@@ -146,9 +80,6 @@ vector<string> TextTokenizer::Tokenize(const std::string & InTxt)
 
 			if (misc.find(tok[s]) != string::npos)
 				AppTok += tok[s];
-
-
-
 
 		}
 		if (!AppTok.empty())

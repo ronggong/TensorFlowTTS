@@ -2,6 +2,7 @@
 #include <sstream>
 #include <iterator>
 #include "Processor.h"
+#include "ext/ZCharScanner.h"
 
 const std::vector<std::string> nums{
 	"zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine",
@@ -280,7 +281,7 @@ void Processor::initSymbolsFS2()
 		symbols.push_back(EOS.substr(i, 1));
 	}
 	for (size_t i = 0; i < symbols.size(); ++i) {
-		SYMBOL_TO_ID[symbols[i]] = i;
+		SYMBOL_TO_ID[symbols[i]] = int(i);
 	}
 }
 
@@ -294,9 +295,14 @@ void Processor::initSymbolsLibritts()
 	}
 }
 
-void Processor::init(const std::string& VoxPath)
+void Processor::init(const std::string& VoxPath,
+	const std::string& lang)
 {
-	g2p.Initialize(VoxPath);
+	Phonemizer* phn = new Phonemizer;
+	phn->Initialize("g2p/" + lang);
+	phn->SetPhnLanguage(lang);
+	g2p.Initialize(phn);
+	ReadPhonemes(VoxPath + "/phonemes.txt");
 }
 
 Processor::Processor(bool libritts)
@@ -344,6 +350,30 @@ Processor::~Processor()
 {
 }
 
+void Processor::ReadPhonemes(const std::string& PhonemePath)
+{
+	std::ifstream Phone(PhonemePath);
+
+	std::string Line;
+	while (std::getline(Phone, Line))
+	{
+		if (Line.find("\t") == std::string::npos)
+			continue;
+
+
+		ZStringDelimiter Deline(Line);
+		Deline.AddDelimiter("\t");
+
+		Phonemes.push_back(Deline[0]);
+		PhonemeIDs.push_back(std::stoi(Deline[1]));
+	}
+}
+
+void Processor::SetDictEntries(const std::vector<DictEntry>& InEntries)
+{
+	CurrentDict = InEntries;
+}
+
 std::vector<int32_t> Processor::textToSequence(const std::string &text)
 {
 	mText = text;
@@ -352,7 +382,7 @@ std::vector<int32_t> Processor::textToSequence(const std::string &text)
 	if (!mText.empty()) {
 		englishCleaners();
 		if (libritts) {
-			mText = g2p.ProcessTextPhonetic(mText);
+			mText = g2p.ProcessTextPhonetic(mText, Phonemes, CurrentDict, ETTSLanguage::Enum::English);
 			std::vector<std::string> textSplit = splitString(mText, ' ');
 			if (textSplit[textSplit.size() - 1] != "SIL") {
 				textSplit.push_back("SIL");
