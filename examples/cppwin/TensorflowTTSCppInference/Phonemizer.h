@@ -6,6 +6,9 @@
 #include <tuple>
 #include <set>
 #include <algorithm>
+#include <unordered_map>
+#include "TextUtils.h"
+#include "PerceptronTagger.h"
 
 struct IdStr {
     int32_t ID;
@@ -25,9 +28,11 @@ class Phonemizer
 {
 private:
 
+    std::unique_ptr<PerceptronTagger> tagger;
     std::vector<IdStr> CharId;
     std::vector<IdStr> PhnId;
     std::vector<VBucket> DictBuckets;
+    std::unordered_map<std::string, std::string> homographsDict;
 
     std::vector<IdStr> GetDelimitedFile(const std::string& InFname);
 
@@ -40,6 +45,7 @@ private:
 
     size_t GetBucketIndex(size_t InSize);
 
+    bool loadHomographDict(const std::string& inHomoDictFn);
 
     std::string PhnLanguage;
 public:

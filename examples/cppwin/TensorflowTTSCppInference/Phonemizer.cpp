@@ -131,10 +131,40 @@ size_t Phonemizer::GetBucketIndex(size_t InSize)
     return 0;
 }
 
+bool Phonemizer::loadHomographDict(const std::string& inHomoDictFn)
+{
+    std::ifstream InFile(inHomoDictFn);
+
+    std::string word;
+    std::string phn;
+
+    if (homographsDict.size())
+        homographsDict.clear();
+
+    std::string line;
+    while (std::getline(InFile, line)) {
+
+        if (line.find("#") != std::string::npos)
+            continue;
+
+        ZStringDelimiter Deline(line);
+        Deline.AddDelimiter("|");
+
+        word = Deline[0];
+        TextUtils::lowercase(word);
+        phn = Deline[1] + "|" + Deline[2] + "|" + Deline[3];
+
+        homographsDict[word] = phn;
+
+    }
+
+    return true;
+}
+
 
 Phonemizer::Phonemizer()
 {
-
+    tagger = std::make_unique<PerceptronTagger>();
 }
 
 bool Phonemizer::Initialize(const std::string InPath)
@@ -143,15 +173,27 @@ bool Phonemizer::Initialize(const std::string InPath)
     CharId = GetDelimitedFile(InPath + "/char2id.txt");
     PhnId = GetDelimitedFile(InPath + "/phn2id.txt");
     LoadDictionary(InPath + "/dict.txt");
+    loadHomographDict(InPath + "/homographs.en");
+
+    // Load tagger files
+    tagger->initialize(InPath);
 
     return true;
 }
 
 std::string Phonemizer::ProcessWord(const std::string& InWord, float Temperature)
 {
+    // Search for homographs in the dict
+    auto search = homographsDict.find(InWord);
+    if (search != homographsDict.end()) {
+        ZStringDelimiter dePhn(search->second);
+        dePhn.AddDelimiter("|");
+        // if pos startswith dePhn[2]: PhnDict = dePhn[0] else dePhn[1]
+        // std::cout << dePhn[0] << " " << dePhn[1] << " " << dePhn[2] << std::endl;
+    }
+
     // First we try dictionary lookup
     // This is because the g2p model can be unreliable, we only want to use it for novel sentences
-
     std::string PhnDict = DictLookup(InWord);
     if (!PhnDict.empty())
         return PhnDict;

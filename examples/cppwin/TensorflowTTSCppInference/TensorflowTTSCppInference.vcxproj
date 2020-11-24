@@ -170,9 +170,11 @@
     <ClInclude Include="ext\ZCharScanner.h" />
     <ClInclude Include="FastSpeech2.h" />
     <ClInclude Include="MultiBandMelGAN.h" />
+    <ClInclude Include="PerceptronTagger.h" />
     <ClInclude Include="Phonemizer.h" />
     <ClInclude Include="Processor.h" />
     <ClInclude Include="TextTokenizer.h" />
+    <ClInclude Include="TextUtils.h" />
     <ClInclude Include="Voice.h" />
     <ClInclude Include="VoxCommon.hpp" />
   </ItemGroup>
@@ -183,10 +185,12 @@
     <ClCompile Include="ext\ZCharScanner.cpp" />
     <ClCompile Include="FastSpeech2.cpp" />
     <ClCompile Include="MultiBandMelGAN.cpp" />
+    <ClCompile Include="PerceptronTagger.cpp" />
     <ClCompile Include="Phonemizer.cpp" />
     <ClCompile Include="Processor.cpp" />
     <ClCompile Include="TensorflowTTSCppInference.cpp" />
     <ClCompile Include="TextTokenizer.cpp" />
+    <ClCompile Include="TextUtils.cpp" />
     <ClCompile Include="Voice.cpp" />
     <ClCompile Include="VoxCommon.cpp" />
   </ItemGroup>

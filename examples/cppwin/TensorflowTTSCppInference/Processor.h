@@ -4,7 +4,8 @@
 #include <string>
 #include <regex>
 #include <unordered_map>
-#include <algorithm>
+//#include <algorithm>
+#include "TextUtils.h"
 #include "EnglishPhoneticProcessor.h"
 #include "Phonemizer.h"
 
@@ -48,7 +49,7 @@ private:
     std::string mText;
     void englishCleaners();
     void convertToAscii();
-    void lowercase();
+    //void lowercase();
     void expandAbbreviations();
     void expandNumbers();
     void collapseWhitespace();

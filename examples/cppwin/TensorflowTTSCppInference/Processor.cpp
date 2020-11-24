@@ -130,7 +130,7 @@ void Processor::englishCleaners()
 {
 	// convertToAscii();
 
-	lowercase();
+	TextUtils::lowercase(mText);
 	expandAbbreviations();
 	expandNumbers();
 	collapseWhitespace();
@@ -141,16 +141,16 @@ void Processor::convertToAscii()
 {
 }
 
-char asciitolower(char in) {
-	if (in <= 'Z' && in >= 'A')
-		return in - ('Z' - 'z');
-	return in;
-}
-
-void Processor::lowercase()
-{
-	std::transform(mText.begin(), mText.end(), mText.begin(), asciitolower);
-}
+//char asciitolower(char in) {
+//	if (in <= 'Z' && in >= 'A')
+//		return in - ('Z' - 'z');
+//	return in;
+//}
+//
+//void Processor::lowercase()
+//{
+//	std::transform(mText.begin(), mText.end(), mText.begin(), asciitolower);
+//}
 
 void Processor::expandAbbreviations()
 {
