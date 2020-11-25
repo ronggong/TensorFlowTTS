@@ -16,7 +16,6 @@ std::vector<float> Voice::Vocalize(const std::string & Prompt, float Speed, int3
 	/*for (auto i: vectorid)
 		std::cout << i << " ";*/
 
-
 	TFTensor<float> Mel = MelPredictor.DoInference(vectorid, SpeakerID, Speed, Energy, F0);
 
 	TFTensor<float> AuData = Vocoder.DoInference(Mel);

@@ -2,13 +2,13 @@
 #ifndef PHONEMIZER_H
 #define PHONEMIZER_H
 #include <vector>
+#include <iostream>
 #include <string>
 #include <tuple>
 #include <set>
 #include <algorithm>
 #include <unordered_map>
 #include "TextUtils.h"
-#include "PerceptronTagger.h"
 
 struct IdStr {
     int32_t ID;
@@ -28,7 +28,6 @@ class Phonemizer
 {
 private:
 
-    std::unique_ptr<PerceptronTagger> tagger;
     std::vector<IdStr> CharId;
     std::vector<IdStr> PhnId;
     std::vector<VBucket> DictBuckets;
@@ -61,7 +60,12 @@ public:
 
     */
     bool Initialize(const std::string InPath);
-    std::string ProcessWord(const std::string& InWord, float Temperature = 0.1f);
+    bool detectHomograph(const std::vector<std::string>& words,
+        std::vector<std::string>& phns);
+    void separateProns(const std::string& prons,
+        std::vector<std::string>& pronsVec);
+    std::string ProcessWord(const std::string& InWord,
+        float Temperature = 0.1f);
     std::string GetPhnLanguage() const;
     void SetPhnLanguage(const std::string& value);
 

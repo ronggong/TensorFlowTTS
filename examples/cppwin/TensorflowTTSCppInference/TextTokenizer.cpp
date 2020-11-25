@@ -56,15 +56,17 @@ vector<string> TextTokenizer::Tokenize(const std::string & InTxt,
 		string AppTok = "";
 		for (size_t s = 0;s < tok.size();s++)
 		{
-
+			// Convert from uppercase to lower
 			if (lowercase.find(tok[s]) != string::npos) {
 				AppTok += tok[s];
 			}
-			size_t IdxInUpper = capitals.find(tok[s]);
-			if (IdxInUpper != string::npos) {
-				// Add its lowercase version
-				AppTok += lowercase[IdxInUpper];
-			}
+
+			// No need, because the string is converted before in EnglishCleaner
+			//size_t IdxInUpper = capitals.find(tok[s]);
+			//if (IdxInUpper != string::npos) {
+			//	// Add its lowercase version
+			//	AppTok += lowercase[IdxInUpper];
+			//}
 
 			// Punctuation handler
 			// This time we explicitly add a token to the vector
@@ -75,7 +77,12 @@ vector<string> TextTokenizer::Tokenize(const std::string & InTxt,
 					ProcessedTokens.push_back(AppTok);
 					AppTok = "";
 				}
-				ProcessedTokens.push_back("SIL");
+				// string punc(1, tok[s]);
+				// Add punctuation
+				// ProcessedTokens.push_back(punc);
+				if (tok[s] != '-') {
+					ProcessedTokens.push_back("SIL");
+				}
 			}
 
 			if (misc.find(tok[s]) != string::npos)
@@ -92,7 +99,6 @@ vector<string> TextTokenizer::Tokenize(const std::string & InTxt,
 		if (ProcessedTokens[ProcessedTokens.size() - 1] == "SIL")
 			ProcessedTokens.pop_back();
 	}
-
 
 	return ProcessedTokens;
 }

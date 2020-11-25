@@ -2,10 +2,13 @@
 
 using namespace std;
 
-bool EnglishPhoneticProcessor::Initialize(Phonemizer* InPhn)
+bool EnglishPhoneticProcessor::Initialize(Phonemizer* InPhn, const std::string& path)
 {
 	Phoner = InPhn;
 	Tokenizer.SetAllowedChars(Phoner->GetGraphemeChars());
+
+	// Load tagger files
+	tagger->initialize(path);
 
 	return true;
 }
@@ -20,13 +23,40 @@ std::string EnglishPhoneticProcessor::ProcessTextPhonetic(const std::string& InT
 
 	vector<string> Words = Tokenizer.Tokenize(InText, InLanguage);
 
+	// Detect Homographs in words
+	// homoPhns: ["pron1|pron2|pos", ...]
+	// homoDetected == true if detected homograph in Words
+	vector<string> homoPhns;
+	bool homoDetected = Phoner->detectHomograph(Words, homoPhns);
+
+	std::vector<std::pair<std::string, std::string>> taggedWords;
+	if (homoDetected) {
+		taggedWords = tagger->tag(Words);
+	}
+
 	string Assemble = "";
 	// Make a copy of the dict passed.
 	std::vector<DictEntry> CurrentDict = InDict;
 
 	for (size_t w = 0; w < Words.size(); w++)
+
 	{
 		const string& Word = Words[w];
+
+		// Detected homographs
+		if (homoDetected && homoPhns[w].size() > 0) {
+			vector<string> pronsVec; 
+			Phoner->separateProns(homoPhns[w], pronsVec);
+			// if pos starts with pronsVec[2] == "V"
+			if (taggedWords[w].second.rfind(pronsVec[2], 0) == 0) {
+				Assemble.append(pronsVec[0]);
+			}
+			else {
+				Assemble.append(pronsVec[1]);
+			}
+			Assemble.append(" ");
+			continue;
+		}
 
 		if (Word.find("@") != std::string::npos) {
 			std::string AddPh = Word.substr(1); // Remove the @
@@ -68,12 +98,13 @@ std::string EnglishPhoneticProcessor::ProcessTextPhonetic(const std::string& InT
 
 EnglishPhoneticProcessor::EnglishPhoneticProcessor()
 {
+	tagger = std::make_unique<PerceptronTagger>();
 	Phoner = nullptr;
 }
 
-EnglishPhoneticProcessor::EnglishPhoneticProcessor(Phonemizer* InPhn)
+EnglishPhoneticProcessor::EnglishPhoneticProcessor(Phonemizer* InPhn, const std::string& path)
 {
-	Initialize(InPhn);
+	Initialize(InPhn, path);
 }
 
 

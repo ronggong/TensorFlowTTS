@@ -3,6 +3,8 @@
 #include "TextTokenizer.h"
 #include "Phonemizer.h"
 #include "VoxCommon.hpp"
+#include "PerceptronTagger.h"
+
 
 struct DictEntry {
 	std::string Word;
@@ -17,6 +19,7 @@ class EnglishPhoneticProcessor
 private:
 	TextTokenizer Tokenizer;
 	Phonemizer* Phoner;
+	std::unique_ptr<PerceptronTagger> tagger;
 
 	inline bool FileExists(const std::string& name) {
 		std::ifstream f(name.c_str());
@@ -24,13 +27,13 @@ private:
 	}
 
 public:
-	bool Initialize(Phonemizer* InPhn);
+	bool Initialize(Phonemizer* InPhn, const std::string& path);
 	std::string ProcessTextPhonetic(const std::string& InText, 
 		const std::vector<std::string>& InPhonemes, 
 		const std::vector<DictEntry>& InDict, 
 		ETTSLanguage::Enum InLanguage);
 	EnglishPhoneticProcessor();
-	EnglishPhoneticProcessor(Phonemizer* InPhn);
+	EnglishPhoneticProcessor(Phonemizer* InPhn, const std::string& path);
 	~EnglishPhoneticProcessor();
 };
 

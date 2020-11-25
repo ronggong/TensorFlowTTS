@@ -23,8 +23,6 @@ std::string GetSTR(const std::vector<IdStr>& In, int32_t InID)
 
 std::vector<IdStr> Phonemizer::GetDelimitedFile(const std::string& InFname)
 {
-
-
     std::ifstream InFile(InFname);
 
     int32_t CuID;
@@ -133,6 +131,8 @@ size_t Phonemizer::GetBucketIndex(size_t InSize)
 
 bool Phonemizer::loadHomographDict(const std::string& inHomoDictFn)
 {
+    // Load g2p-en homographs.en dictionary
+    // return an unordered_map of which key: word, value: pron1|pron2|pos
     std::ifstream InFile(inHomoDictFn);
 
     std::string word;
@@ -164,7 +164,6 @@ bool Phonemizer::loadHomographDict(const std::string& inHomoDictFn)
 
 Phonemizer::Phonemizer()
 {
-    tagger = std::make_unique<PerceptronTagger>();
 }
 
 bool Phonemizer::Initialize(const std::string InPath)
@@ -175,28 +174,47 @@ bool Phonemizer::Initialize(const std::string InPath)
     LoadDictionary(InPath + "/dict.txt");
     loadHomographDict(InPath + "/homographs.en");
 
-    // Load tagger files
-    tagger->initialize(InPath);
-
     return true;
 }
 
-std::string Phonemizer::ProcessWord(const std::string& InWord, float Temperature)
+bool Phonemizer::detectHomograph(const std::vector<std::string>& words,
+    std::vector<std::string>& phns)
 {
+    bool detected = false;
     // Search for homographs in the dict
-    auto search = homographsDict.find(InWord);
-    if (search != homographsDict.end()) {
-        ZStringDelimiter dePhn(search->second);
-        dePhn.AddDelimiter("|");
-        // if pos startswith dePhn[2]: PhnDict = dePhn[0] else dePhn[1]
-        // std::cout << dePhn[0] << " " << dePhn[1] << " " << dePhn[2] << std::endl;
+    for (const std::string& word : words) {
+        auto search = homographsDict.find(word);
+        if (search != homographsDict.end()) {
+            phns.push_back(search->second);
+            detected = true;
+        }
+        else {
+            phns.push_back("");
+        }
     }
+    return detected;
+}
 
+void Phonemizer::separateProns(const std::string& prons, std::vector<std::string>& pronsVec)
+{
+    // dePhn[0]: pron1, dePhn[1]: pron2, dePhn[2]: pos
+    ZStringDelimiter dePhn(prons);
+    dePhn.AddDelimiter("|");
+    for (size_t i = 0; i < dePhn.szTokens(); i++) {
+        pronsVec.push_back(dePhn[i]);
+        // std::cout << dePhn[i];
+    }
+}
+
+std::string Phonemizer::ProcessWord(const std::string& InWord, 
+    float Temperature)
+{
     // First we try dictionary lookup
     // This is because the g2p model can be unreliable, we only want to use it for novel sentences
     std::string PhnDict = DictLookup(InWord);
     if (!PhnDict.empty())
         return PhnDict;
+    return "";
 }
 
 std::string Phonemizer::GetPhnLanguage() const

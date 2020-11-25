@@ -301,7 +301,7 @@ void Processor::init(const std::string& VoxPath,
 	Phonemizer* phn = new Phonemizer;
 	phn->Initialize("g2p/" + lang);
 	phn->SetPhnLanguage(lang);
-	g2p.Initialize(phn);
+	g2p.Initialize(phn, "g2p/" + lang);
 	ReadPhonemes(VoxPath + "/phonemes.txt");
 }
 
