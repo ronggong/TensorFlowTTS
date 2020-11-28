@@ -153,6 +153,9 @@
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>D:\projects\stuttertalk\tts\packages\eigen-3.3.8;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
+      <OpenMPSupport>false</OpenMPSupport>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -169,6 +172,7 @@
     <ClInclude Include="ext\CppFlow\include\Tensor.h" />
     <ClInclude Include="ext\ZCharScanner.h" />
     <ClInclude Include="FastSpeech2.h" />
+    <ClInclude Include="G2pseq.h" />
     <ClInclude Include="MultiBandMelGAN.h" />
     <ClInclude Include="PerceptronTagger.h" />
     <ClInclude Include="Phonemizer.h" />
@@ -184,6 +188,7 @@
     <ClCompile Include="ext\CppFlow\src\Tensor.cpp" />
     <ClCompile Include="ext\ZCharScanner.cpp" />
     <ClCompile Include="FastSpeech2.cpp" />
+    <ClCompile Include="G2pseq.cpp" />
     <ClCompile Include="MultiBandMelGAN.cpp" />
     <ClCompile Include="PerceptronTagger.cpp" />
     <ClCompile Include="Phonemizer.cpp" />

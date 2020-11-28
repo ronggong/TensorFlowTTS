@@ -4,6 +4,7 @@
 #include "Phonemizer.h"
 #include "VoxCommon.hpp"
 #include "PerceptronTagger.h"
+#include "G2pseq.h"
 
 
 struct DictEntry {
@@ -20,6 +21,7 @@ private:
 	TextTokenizer Tokenizer;
 	Phonemizer* Phoner;
 	std::unique_ptr<PerceptronTagger> tagger;
+	std::unique_ptr<G2pseq> g2pseq;
 
 	inline bool FileExists(const std::string& name) {
 		std::ifstream f(name.c_str());

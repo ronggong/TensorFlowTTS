@@ -10,6 +10,8 @@ bool EnglishPhoneticProcessor::Initialize(Phonemizer* InPhn, const std::string& 
 	// Load tagger files
 	tagger->initialize(path);
 
+	g2pseq->initialize(path);
+
 	return true;
 }
 
@@ -43,17 +45,9 @@ std::string EnglishPhoneticProcessor::ProcessTextPhonetic(const std::string& InT
 	{
 		const string& Word = Words[w];
 
-		// Detected homographs
-		if (homoDetected && homoPhns[w].size() > 0) {
-			vector<string> pronsVec; 
-			Phoner->separateProns(homoPhns[w], pronsVec);
-			// if pos starts with pronsVec[2] == "V"
-			if (taggedWords[w].second.rfind(pronsVec[2], 0) == 0) {
-				Assemble.append(pronsVec[0]);
-			}
-			else {
-				Assemble.append(pronsVec[1]);
-			}
+		// SIL goes directly to the output
+		if (Word == "SIL") {
+			Assemble.append(Word);
 			Assemble.append(" ");
 			continue;
 		}
@@ -77,7 +71,26 @@ std::string EnglishPhoneticProcessor::ProcessTextPhonetic(const std::string& InT
 			continue;
 		}
 
+		// Detected homographs
+		if (homoDetected && homoPhns[w].size() > 0) {
+			vector<string> pronsVec;
+			Phoner->separateProns(homoPhns[w], pronsVec);
+			// if pos starts with pronsVec[2] == "V"
+			if (taggedWords[w].second.rfind(pronsVec[2], 0) == 0) {
+				Assemble.append(pronsVec[0]);
+			}
+			else {
+				Assemble.append(pronsVec[1]);
+			}
+			Assemble.append(" ");
+			continue;
+		}
+
 		std::string Res = Phoner->ProcessWord(Word, 0.001f);
+
+		if (Res.empty()) {
+			Res = g2pseq->predict(Word);
+		}
 
 		// Cache the word in the override dict so next time we don't have to research it
 		CurrentDict.push_back({ Word, Res });
@@ -99,6 +112,7 @@ std::string EnglishPhoneticProcessor::ProcessTextPhonetic(const std::string& InT
 EnglishPhoneticProcessor::EnglishPhoneticProcessor()
 {
 	tagger = std::make_unique<PerceptronTagger>();
+	g2pseq = std::make_unique<G2pseq>();
 	Phoner = nullptr;
 }
 
