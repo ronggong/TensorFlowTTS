@@ -41,9 +41,14 @@ std::string EnglishPhoneticProcessor::ProcessTextPhonetic(const std::string& InT
 	std::vector<DictEntry> CurrentDict = InDict;
 
 	for (size_t w = 0; w < Words.size(); w++)
-
 	{
 		const string& Word = Words[w];
+
+		if (PUNCT.find(Word[0]) != string::npos) {
+			Assemble.append(Word);
+			Assemble.append(" ");
+			continue;
+		}
 
 		// SIL goes directly to the output
 		if (Word == "SIL") {

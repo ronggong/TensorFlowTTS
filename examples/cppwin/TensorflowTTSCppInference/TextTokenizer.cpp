@@ -6,7 +6,7 @@
 #include <stdexcept>
 
 // Punctuation, this gets auto-converted to SIL
-const std::string punctuation = ",.-;";
+const std::string punctuation = ",.-:;!?";
 
 // Capitals and lowercases, both having equal indexes
 const std::string capitals = "QWERTYUIOPASDFGHJKLZXCVBNM";
@@ -77,12 +77,12 @@ vector<string> TextTokenizer::Tokenize(const std::string & InTxt,
 					ProcessedTokens.push_back(AppTok);
 					AppTok = "";
 				}
-				// string punc(1, tok[s]);
+				string punc(1, tok[s]);
 				// Add punctuation
-				// ProcessedTokens.push_back(punc);
-				if (tok[s] != '-') {
+				ProcessedTokens.push_back(punc);
+				/*if (tok[s] != '-') {
 					ProcessedTokens.push_back("SIL");
-				}
+				}*/
 			}
 
 			if (misc.find(tok[s]) != string::npos)

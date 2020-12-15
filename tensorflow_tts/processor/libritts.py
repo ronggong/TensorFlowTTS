@@ -31,10 +31,11 @@ valid_symbols = g2p.phonemes
 valid_symbols.append("SIL")
 valid_symbols.append("END")
 
-_punctuation = "!'(),.:;? "
+_punctuation = "!'(),.:;?"
+_space = " "
 _arpabet = ["@" + s for s in valid_symbols]
 
-LIBRITTS_SYMBOLS = _arpabet + list(_punctuation)
+LIBRITTS_SYMBOLS = _arpabet + list(_punctuation) + list(_space)
 
 
 @dataclass
@@ -107,14 +108,13 @@ class LibriTTSProcessor(BaseProcessor):
         data = []
         for i, txt in enumerate(g2p_text):
             if i == len(g2p_text) - 1:
-                if txt != " " and txt != "SIL":
+                if txt in _punctuation:
+                    data.append(txt)
+                elif txt != " " and txt != "SIL":
                     data.append("@" + txt)
-                else:
-                    data.append(
-                        "@END"
-                    )  # TODO try learning without end token and compare results
                 break
-            data.append("@" + txt) if txt != " " else data.append(
-                "@SIL"
-            )  # TODO change it in inference
+            if txt in _punctuation:
+                data.append(txt)
+            elif txt != " ":
+                data.append("@" + txt)
         return data

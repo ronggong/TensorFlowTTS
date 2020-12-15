@@ -13,8 +13,8 @@ std::vector<float> Voice::Vocalize(const std::string & Prompt, float Speed, int3
 {
 
 	std::vector<int32_t> vectorid = processor.textToSequence(Prompt);
-	/*for (auto i: vectorid)
-		std::cout << i << " ";*/
+	for (auto i: vectorid)
+		std::cout << i << " ";
 
 	TFTensor<float> Mel = MelPredictor.DoInference(vectorid, SpeakerID, Speed, Energy, F0);
 

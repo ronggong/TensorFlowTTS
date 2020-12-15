@@ -24,7 +24,7 @@ public:
 	Voice(const std::string& VoxPath,
 		const std::string& lang = "English");
 
-	std::vector<float> Vocalize(const std::string& Prompt, float Speed = 1.f, int32_t SpeakerID = 0, float Energy = 1.f, float F0 = 1.f);
+	std::vector<float> Vocalize(const std::string& Prompt, float Speed = 1.f, int32_t SpeakerID = 1, float Energy = 1.f, float F0 = 1.f);
 
 
 	~Voice();

@@ -2,6 +2,8 @@
 #include <string>
 #include <algorithm>
 
+const std::string PUNCT = "!'(),.:;?";
+
 class TextUtils {
 public:
 	static void lowercase(std::string& text);

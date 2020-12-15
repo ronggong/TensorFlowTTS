@@ -291,7 +291,7 @@ void Processor::initSymbolsLibritts()
 		symbols.push_back(VALID_SYMBOLS_LIBRITTS[i]);
 	}
 	for (int32_t i = 0; i < symbols.size(); i++) {
-		SYMBOL_TO_ID[symbols[i]] = i + 4;
+		SYMBOL_TO_ID[symbols[i]] = i;
 	}
 }
 
@@ -384,12 +384,11 @@ std::vector<int32_t> Processor::textToSequence(const std::string &text)
 		if (libritts) {
 			mText = g2p.ProcessTextPhonetic(mText, Phonemes, CurrentDict, ETTSLanguage::Enum::English);
 			std::vector<std::string> textSplit = splitString(mText, ' ');
-			if (textSplit[textSplit.size() - 1] != "SIL") {
-				textSplit.push_back("SIL");
+			if (PUNCT.find(textSplit[textSplit.size() - 1]) == std::string::npos) {
+				textSplit.push_back(".");
 			}
-			textSplit.push_back("END");
 			for (size_t i = 0; i < textSplit.size(); i++) {
-				std::cout << textSplit[i] << std::endl;
+				// std::cout << textSplit[i] << std::endl;
 				sequence.push_back(SYMBOL_TO_ID[textSplit[i]]);
 			}
 		}

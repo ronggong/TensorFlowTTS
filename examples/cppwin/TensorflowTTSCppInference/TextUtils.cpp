@@ -14,3 +14,4 @@ bool TextUtils::isDigits(const std::string& text)
 {
 	return std::all_of(text.begin(), text.end(), ::isdigit);
 }
+

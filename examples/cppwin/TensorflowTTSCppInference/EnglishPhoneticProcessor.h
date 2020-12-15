@@ -5,6 +5,7 @@
 #include "VoxCommon.hpp"
 #include "PerceptronTagger.h"
 #include "G2pseq.h"
+#include "TextUtils.h"
 
 
 struct DictEntry {
