@@ -2,7 +2,6 @@
 
 #include "FastSpeech2.h"
 #include "MultiBandMelGAN.h"
-// #include "EnglishPhoneticProcessor.h"
 #include "Processor.h"
 
 class Voice
@@ -10,10 +9,7 @@ class Voice
 private:
 	FastSpeech2 MelPredictor;
 	MultiBandMelGAN Vocoder;
-	// EnglishPhoneticProcessor Processor;
 	Processor processor;
-
-	std::vector<int32_t> PhonemesToID(const std::string& InTxt);
 
 public:
 	/* Voice constructor, arguments obligatory.
@@ -25,9 +21,10 @@ public:
 	 ---  g2p.fst: Phonetisaurus FST G2P model.
 
 	*/
-	Voice(const std::string& VoxPath);
+	Voice(const std::string& VoxPath,
+		const std::string& lang = "English");
 
-	std::vector<float> Vocalize(const std::string& Prompt, float Speed = 1.f, int32_t SpeakerID = 0, float Energy = 1.f, float F0 = 1.f);
+	std::vector<float> Vocalize(const std::string& Prompt, float Speed = 1.f, int32_t SpeakerID = 1, float Energy = 1.f, float F0 = 1.f);
 
 
 	~Voice();

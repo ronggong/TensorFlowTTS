@@ -7,7 +7,7 @@ int main()
 {
 	bool Running = true;
 	LOGF("Loading voice...");
-	Voice LJSpeech("LJ");
+	Voice LJSpeech("LJ", "English");
 	while (Running) 
 	{
 		std::string Prompt = "";
@@ -24,11 +24,9 @@ int main()
 
 		std::string Filename = Prompt.substr(0, std::min(16, (int)Prompt.size())) + ".wav";
 
-		VoxUtil::ExportWAV(Filename, Audata, 22050);
+		VoxUtil::ExportWAV(Filename, Audata, 24000);
 		LOGF("Saved to " + Filename);
 		
-
-
 	}
 
 

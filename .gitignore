@@ -19,6 +19,7 @@ __pycache__/
 .coverage*
 coverage.xml*
 .vscode*
+.vs/
 .nfs*
 .ipynb_checkpoints
 ljspeech
@@ -43,4 +44,6 @@ dump_ljspeech/
 dump_kss/
 dump_libritts/
 /examples/*/*
+!/examples/cppwin/*
+/examples/cppwin/deps/
 /notebooks/test_saved/
