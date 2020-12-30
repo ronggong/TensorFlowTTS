@@ -19,6 +19,9 @@
     <Filter Include="ext\CppFlow">
       <UniqueIdentifier>{9706a0f7-2bc3-4d3b-913f-e9a21d1f039a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ext\CppFlow2">
+      <UniqueIdentifier>{46318c7d-44ce-40c3-b99f-495bed5c9625}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="EnglishPhoneticProcessor.h">
@@ -45,12 +48,6 @@
     <ClInclude Include="ext\ZCharScanner.h">
       <Filter>ext</Filter>
     </ClInclude>
-    <ClInclude Include="ext\CppFlow\include\Model.h">
-      <Filter>ext\CppFlow</Filter>
-    </ClInclude>
-    <ClInclude Include="ext\CppFlow\include\Tensor.h">
-      <Filter>ext\CppFlow</Filter>
-    </ClInclude>
     <ClInclude Include="Processor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -64,6 +61,42 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="G2pseq.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ext\CppFlow\include\Model.h">
+      <Filter>ext\CppFlow</Filter>
+    </ClInclude>
+    <ClInclude Include="ext\CppFlow\include\Tensor.h">
+      <Filter>ext\CppFlow</Filter>
+    </ClInclude>
+    <ClInclude Include="ext\CppFlow2\context.h">
+      <Filter>ext\CppFlow2</Filter>
+    </ClInclude>
+    <ClInclude Include="ext\CppFlow2\cppflow.h">
+      <Filter>ext\CppFlow2</Filter>
+    </ClInclude>
+    <ClInclude Include="ext\CppFlow2\datatype.h">
+      <Filter>ext\CppFlow2</Filter>
+    </ClInclude>
+    <ClInclude Include="ext\CppFlow2\defer.h">
+      <Filter>ext\CppFlow2</Filter>
+    </ClInclude>
+    <ClInclude Include="ext\CppFlow2\model.h">
+      <Filter>ext\CppFlow2</Filter>
+    </ClInclude>
+    <ClInclude Include="ext\CppFlow2\ops.h">
+      <Filter>ext\CppFlow2</Filter>
+    </ClInclude>
+    <ClInclude Include="ext\CppFlow2\raw_ops.h">
+      <Filter>ext\CppFlow2</Filter>
+    </ClInclude>
+    <ClInclude Include="ext\CppFlow2\tensor.h">
+      <Filter>ext\CppFlow2</Filter>
+    </ClInclude>
+    <ClInclude Include="FastSpeech2CppFlow2.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MultiBandMelGANCppFlow2.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -92,12 +125,6 @@
     <ClCompile Include="ext\ZCharScanner.cpp">
       <Filter>ext</Filter>
     </ClCompile>
-    <ClCompile Include="ext\CppFlow\src\Model.cpp">
-      <Filter>ext\CppFlow</Filter>
-    </ClCompile>
-    <ClCompile Include="ext\CppFlow\src\Tensor.cpp">
-      <Filter>ext\CppFlow</Filter>
-    </ClCompile>
     <ClCompile Include="Processor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -111,6 +138,18 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="G2pseq.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ext\CppFlow\src\Model.cpp">
+      <Filter>ext\CppFlow</Filter>
+    </ClCompile>
+    <ClCompile Include="ext\CppFlow\src\Tensor.cpp">
+      <Filter>ext\CppFlow</Filter>
+    </ClCompile>
+    <ClCompile Include="FastSpeech2CppFlow2.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MultiBandMelGANCppFlow2.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

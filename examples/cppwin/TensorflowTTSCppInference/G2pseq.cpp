@@ -120,7 +120,9 @@ bool G2pseq::initialize(std::string path)
 
     // Load encoder parameters
     int col = variables["enc_emb"].size() / 29;
-    encEmb.resize(29, col);
+    //std::cout << col << std::endl;
+
+    //encEmb.resize(29, col);
     for (int i = 0; i < 29; i++) {
         for (int j = 0; j < col; j++) {
             encEmb(i, j) = variables["enc_emb"][i * col + j].asFloat();
@@ -128,7 +130,9 @@ bool G2pseq::initialize(std::string path)
     }
 
     col = variables["enc_w_ih"].size() / 768;
-    encWIh.resize(768, col);
+    //std::cout << col << std::endl;
+
+    //encWIh.resize(768, col);
     for (int i = 0; i < 768; i++) {
         for (int j = 0; j < col; j++) {
             encWIh(i, j) = variables["enc_w_ih"][i * col + j].asFloat();
@@ -136,26 +140,30 @@ bool G2pseq::initialize(std::string path)
     }
 
     col = variables["enc_w_hh"].size() / 768;
-    encWHh.resize(768, col);
+    //std::cout << col << std::endl;
+
+    //encWHh.resize(768, col);
     for (int i = 0; i < 768; i++) {
         for (int j = 0; j < col; j++) {
             encWHh(i, j) = variables["enc_w_hh"][i * col + j].asFloat();
         }
     }
 
-    encBIh.resize(768, 1);
+    //encBIh.resize(768, 1);
     for (int i = 0; i < 768; i++) {
         encBIh(i, 0) = variables["enc_b_ih"][i].asFloat();
     }
 
-    encBHh.resize(768, 1);
+    //encBHh.resize(768, 1);
     for (int i = 0; i < 768; i++) {
         encBHh(i, 0) = variables["enc_b_hh"][i].asFloat();
     }
 
     // Load decoder parameters
     col = variables["dec_emb"].size() / 74;
-    decEmb.resize(74, col);
+    //std::cout << col << std::endl;
+
+    //decEmb.resize(74, col);
     for (int i = 0; i < 74; i++) {
         for (int j = 0; j < col; j++) {
             decEmb(i, j) = variables["dec_emb"][i * col + j].asFloat();
@@ -163,7 +171,9 @@ bool G2pseq::initialize(std::string path)
     }
 
     col = variables["dec_w_ih"].size() / 768;
-    decWIh.resize(768, col);
+    //std::cout << col << std::endl;
+
+    //decWIh.resize(768, col);
     for (int i = 0; i < 768; i++) {
         for (int j = 0; j < col; j++) {
             decWIh(i, j) = variables["dec_w_ih"][i * col + j].asFloat();
@@ -171,32 +181,36 @@ bool G2pseq::initialize(std::string path)
     }
 
     col = variables["dec_w_hh"].size() / 768;
-    decWHh.resize(768, col);
+    //std::cout << col << std::endl;
+
+    //decWHh.resize(768, col);
     for (int i = 0; i < 768; i++) {
         for (int j = 0; j < col; j++) {
             decWHh(i, j) = variables["dec_w_hh"][i * col + j].asFloat();
         }
     }
    
-    decBIh.resize(768, 1);
+    //decBIh.resize(768, 1);
     for (int i = 0; i < 768; i++) {
         decBIh(i, 0) = variables["dec_b_ih"][i].asFloat();
     }
     
-    decBHh.resize(768, 1);
+    //decBHh.resize(768, 1);
     for (int i = 0; i < 768; i++) {
         decBHh(i, 0) = variables["dec_b_hh"][i].asFloat();
     }
 
     col = variables["fc_w"].size() / 74;
-    fcW.resize(74, col);
+    //std::cout << col << std::endl;
+
+    //fcW.resize(74, col);
     for (int i = 0; i < 74; i++) {
         for (int j = 0; j < col; j++) {
             fcW(i, j) = variables["fc_w"][i * col + j].asFloat();
         }
     }
 
-    fcB.resize(74, 1);
+    //fcB.resize(74, 1);
     for (int i = 0; i < 74; i++) {
         fcB(i, 0) = variables["fc_b"][i].asFloat();
     }
