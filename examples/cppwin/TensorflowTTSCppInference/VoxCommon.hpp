@@ -32,8 +32,6 @@ namespace VoxUtil {
 			TotalSize *= Dim;
 
 		return TFTensor<F>{Data, Shape, TotalSize};
-
-
 	}
 
 	template<typename V>

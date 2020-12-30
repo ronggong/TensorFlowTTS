@@ -1,12 +1,12 @@
 #pragma once
 
-#include "ext/CppFlow/include/Model.h"
+#include "ext/CppFlow2/cppflow.h"
 #include "VoxCommon.hpp"
-class MultiBandMelGAN
+class MultiBandMelGANCppFlow2
 {
 private:
 	//Model* MelGAN;
-	std::unique_ptr<Model> MelGAN;
+	std::unique_ptr<cppflow::model> melgan;
 
 public:
 	bool Initialize(const std::string& VocoderPath);
@@ -15,9 +15,8 @@ public:
 	// Do MultiBand MelGAN inference including PQMF
 	// -> InMel:  Mel spectrogram (shape [1, xx, 80])
 	// <- Returns: Tensor data [4, xx, 1]
-	Tensor DoInference(Tensor& InMel);
+	cppflow::tensor DoInference(const cppflow::tensor& InMel);
 
-	MultiBandMelGAN();
-	~MultiBandMelGAN();
+	MultiBandMelGANCppFlow2();
+	~MultiBandMelGANCppFlow2();
 };
-

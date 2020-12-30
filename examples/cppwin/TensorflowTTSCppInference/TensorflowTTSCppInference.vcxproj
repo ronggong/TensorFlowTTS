@@ -156,6 +156,7 @@
       <AdditionalIncludeDirectories>D:\projects\stuttertalk\tts\packages\eigen-3.3.8;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
       <OpenMPSupport>false</OpenMPSupport>
+      <LanguageStandard>stdcpp14</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -168,12 +169,22 @@
   <ItemGroup>
     <ClInclude Include="EnglishPhoneticProcessor.h" />
     <ClInclude Include="ext\AudioFile.hpp" />
+    <ClInclude Include="ext\CppFlow2\context.h" />
+    <ClInclude Include="ext\CppFlow2\cppflow.h" />
+    <ClInclude Include="ext\CppFlow2\datatype.h" />
+    <ClInclude Include="ext\CppFlow2\defer.h" />
+    <ClInclude Include="ext\CppFlow2\model.h" />
+    <ClInclude Include="ext\CppFlow2\ops.h" />
+    <ClInclude Include="ext\CppFlow2\raw_ops.h" />
+    <ClInclude Include="ext\CppFlow2\tensor.h" />
     <ClInclude Include="ext\CppFlow\include\Model.h" />
     <ClInclude Include="ext\CppFlow\include\Tensor.h" />
     <ClInclude Include="ext\ZCharScanner.h" />
     <ClInclude Include="FastSpeech2.h" />
+    <ClInclude Include="FastSpeech2CppFlow2.h" />
     <ClInclude Include="G2pseq.h" />
     <ClInclude Include="MultiBandMelGAN.h" />
+    <ClInclude Include="MultiBandMelGANCppFlow2.h" />
     <ClInclude Include="PerceptronTagger.h" />
     <ClInclude Include="Phonemizer.h" />
     <ClInclude Include="Processor.h" />
@@ -188,8 +199,10 @@
     <ClCompile Include="ext\CppFlow\src\Tensor.cpp" />
     <ClCompile Include="ext\ZCharScanner.cpp" />
     <ClCompile Include="FastSpeech2.cpp" />
+    <ClCompile Include="FastSpeech2CppFlow2.cpp" />
     <ClCompile Include="G2pseq.cpp" />
     <ClCompile Include="MultiBandMelGAN.cpp" />
+    <ClCompile Include="MultiBandMelGANCppFlow2.cpp" />
     <ClCompile Include="PerceptronTagger.cpp" />
     <ClCompile Include="Phonemizer.cpp" />
     <ClCompile Include="Processor.cpp" />

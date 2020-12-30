@@ -2,6 +2,8 @@
 
 #include "FastSpeech2.h"
 #include "MultiBandMelGAN.h"
+//#include "FastSpeech2CppFlow2.h"
+//#include "MultiBandMelGANCppFlow2.h"
 #include "Processor.h"
 
 class Voice
@@ -9,6 +11,8 @@ class Voice
 private:
 	FastSpeech2 MelPredictor;
 	MultiBandMelGAN Vocoder;
+	// FastSpeech2CppFlow2 MelPredictor;
+	// MultiBandMelGANCppFlow2 Vocoder;
 	Processor processor;
 
 public:

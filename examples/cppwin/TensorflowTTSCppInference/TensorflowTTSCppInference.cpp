@@ -1,10 +1,24 @@
 
 #include <iostream>
+// #include <windows.h>
 #include "Voice.h"
 #define LOGF(txt) std::cout << txt <<  "\n"
 
+//static std::string ExePath() {
+//	char buffer[MAX_PATH];
+//	GetModuleFileNameA(NULL, buffer, MAX_PATH);
+//	std::string::size_type pos = std::string(buffer).find_last_of("\\/");
+//	return std::string(buffer).substr(0, pos);
+//}
+
 int main()
 {
+	 //char filename[] = "LJ";
+	 //char fullFilename[MAX_PATH];
+	 //GetFullPathNameA(filename, MAX_PATH, fullFilename, nullptr);
+	 //std::string exePath = ExePath();
+	 //LOGF(exePath);
+	
 	bool Running = true;
 	LOGF("Loading voice...");
 	Voice LJSpeech("LJ", "English");
@@ -21,7 +35,6 @@ int main()
 		}
 		std::vector<float> Audata = LJSpeech.Vocalize(Prompt);
 		
-
 		std::string Filename = Prompt.substr(0, std::min(16, (int)Prompt.size())) + ".wav";
 
 		VoxUtil::ExportWAV(Filename, Audata, 24000);

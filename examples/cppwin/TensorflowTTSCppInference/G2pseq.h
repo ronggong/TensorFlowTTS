@@ -18,18 +18,18 @@ private:
 	std::unordered_map<std::string, size_t> p2idx;
 	std::unordered_map<size_t, std::string> idx2p;
 
-	MatrixXf encEmb;
-	MatrixXf encWIh;
-	MatrixXf encWHh;
-	MatrixXf encBIh;
-	MatrixXf encBHh;
-	MatrixXf decEmb;
-	MatrixXf decWIh;
-	MatrixXf decWHh;
-	MatrixXf decBIh;
-	MatrixXf decBHh;
-	MatrixXf fcW;
-	MatrixXf fcB;
+	MatrixXf encEmb = MatrixXf::Zero(29, 256);
+	MatrixXf encWIh = MatrixXf::Zero(768, 256);
+	MatrixXf encWHh = MatrixXf::Zero(768, 256);
+	MatrixXf encBIh = MatrixXf::Zero(768, 1);
+	MatrixXf encBHh = MatrixXf::Zero(768, 1);
+	MatrixXf decEmb = MatrixXf::Zero(74, 256);
+	MatrixXf decWIh = MatrixXf::Zero(768, 256);
+	MatrixXf decWHh = MatrixXf::Zero(768, 256);
+	MatrixXf decBIh = MatrixXf::Zero(768, 1);
+	MatrixXf decBHh = MatrixXf::Zero(768, 1);
+	MatrixXf fcW = MatrixXf::Zero(74, 256);
+	MatrixXf fcB = MatrixXf::Zero(74, 1);
 
 	MatrixXf encode(std::string word);
 	void grucell(MatrixXf& x, MatrixXf& h,
