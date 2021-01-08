@@ -45,6 +45,8 @@ class BaseProcessor(abc.ABC):
     items: List[List[str]] = field(default_factory=list)  # text, wav_path, speaker_name
     symbol_to_id: Dict[str, int] = field(default_factory=dict)
     id_to_symbol: Dict[int, str] = field(default_factory=dict)
+    # MFA alignment, used in baker processor
+    mfa: bool = False
 
     def __post_init__(self):
 

@@ -34,7 +34,6 @@ logging.basicConfig(
     format="%(asctime)s (%(module)s:%(lineno)d) %(levelname)s: %(message)s",
 )
 
-
 @dataclass
 class TxtGridParser:
     sample_rate: int
@@ -43,12 +42,18 @@ class TxtGridParser:
     hop_size: int
     output_durations_path: str
     dataset_path: str
+    dataset: str = "libritts"
     training_file: str = "train.txt"
-    phones_mapper = {"sil": "SIL", "sp": "SIL", "spn": "SIL", "": "END"}
-    """ '' -> is last token in every cases i encounter so u can change it for END but there is a safety check
-        so it'll fail always when empty string isn't last char in ur dataset just chang it to silence then
-    """
-    sil_phones = set(phones_mapper.keys())
+
+    def __post_init__(self):
+        if self.dataset=='baker':
+            self.phones_mapper = {"sil": "sil", "sp": "#0", "spn": "#1", "": "eos"}
+        else:
+            self.phones_mapper = {"sil": "SIL", "sp": "SIL", "spn": "SIL", "": "END"}
+        """ '' -> is last token in every cases i encounter so u can change it for END but there is a safety check
+            so it'll fail always when empty string isn't last char in ur dataset just chang it to silence then
+        """
+        self.sil_phones = set(self.phones_mapper.keys())
 
     def parse(self):
         speakers = (
@@ -78,9 +83,13 @@ class TxtGridParser:
             f"\n Parse: {len(file_list)} files, speaker name: {speaker_name} \n"
         )
         for f_name in tqdm(file_list):
-            text_grid = textgrid.TextGrid.fromFile(
-                os.path.join(self.txt_grid_path, speaker_name, f_name)
-            )
+            try:
+                text_grid = textgrid.TextGrid.fromFile(
+                    os.path.join(self.txt_grid_path, speaker_name, f_name)
+                )
+            except Exception as e:
+                print(f"{e}, {f_name}")
+                continue
             pha = text_grid[1]
             durations = []
             phs = []
@@ -102,12 +111,15 @@ class TxtGridParser:
             assert full_ph.split(" ").__len__() == durations.__len__()  # safety check
 
             base_name = f_name.split(".TextGrid")[0]
+            data.append(f"{speaker_name}/{base_name}|{full_ph}|{speaker_name}\n")
+
+            if self.dataset=='baker':
+                base_name=str(int(base_name))
             np.save(
                 os.path.join(self.output_durations_path, f"{base_name}-durations.npy"),
                 np.array(durations).astype(np.int32),
                 allow_pickle=False,
             )
-            data.append(f"{speaker_name}/{base_name}|{full_ph}|{speaker_name}\n")
 
 
 @click.command()
@@ -120,6 +132,7 @@ class TxtGridParser:
 @click.option("--sample_rate", default=24000, type=int)
 @click.option("--multi_speakers", default=1, type=int, help="Use multi-speaker version")
 @click.option("--train_file", default="train.txt")
+@click.option("--dataset", type=str, default="librtts")
 def main(
     yaml_path: str,
     dataset_path: str,
@@ -128,6 +141,7 @@ def main(
     sample_rate: int,
     multi_speakers: int,
     train_file: str,
+    dataset: str
 ):
 
     with open(yaml_path) as file:
@@ -144,6 +158,7 @@ def main(
         output_durations_path=output_durations_path,
         training_file=train_file,
         dataset_path=dataset_path,
+        dataset=dataset
     )
     txt_grid_parser.parse()
 

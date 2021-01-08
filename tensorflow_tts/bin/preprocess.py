@@ -75,6 +75,11 @@ def parse_and_config():
         help="Dataset to preprocess.",
     )
     parser.add_argument(
+        "--mfa",
+        action='store_true',
+        help="MFA alignment.",
+    )
+    parser.add_argument(
         "--config", type=str, required=True, help="YAML format configuration file."
     )
     parser.add_argument(
@@ -139,7 +144,7 @@ def ph_based_trim(
     duration_fixed_path = config.get(
         "duration_fixed_path", os.path.join(config["rootdir"], "trimmed-durations")
     )
-    sil_ph = ["SIL", "END"]  # TODO FIX hardcoded values
+    sil_ph = ["SIL", "END", "sil", "eos"]  # TODO FIX hardcoded values
     text = raw_text.split(" ")
 
     trim_start, trim_end = False, False
@@ -375,6 +380,7 @@ def preprocess():
         config["rootdir"],
         symbols=dataset_symbol[config["dataset"]],
         cleaner_names=dataset_cleaner[config["dataset"]],
+        mfa=config["mfa"]
     )
 
     # check output directories
@@ -568,3 +574,6 @@ def compute_statistics():
     logging.info("Saving computed statistics.")
     scaler_list = [(scaler_mel, ""), (scaler_energy, "_energy"), (scaler_f0, "_f0")]
     save_statistics_to_file(scaler_list, config)
+
+if __name__ == '__main__':
+    normalize()

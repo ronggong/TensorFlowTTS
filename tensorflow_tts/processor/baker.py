@@ -22,10 +22,11 @@ import librosa
 import numpy as np
 import soundfile as sf
 from dataclasses import dataclass, field
-from pypinyin import Style
-from pypinyin.contrib.neutral_tone import NeutralToneWith5Mixin
-from pypinyin.converter import DefaultConverter
-from pypinyin.core import Pinyin
+from g2pM import G2pM
+# from pypinyin import Style
+# from pypinyin.contrib.neutral_tone import NeutralToneWith5Mixin
+# from pypinyin.converter import DefaultConverter
+# from pypinyin.core import Pinyin
 from tensorflow_tts.processor import BaseProcessor
 
 _pad = ["pad"]
@@ -526,6 +527,8 @@ PINYIN_DICT = {
 
 zh_pattern = re.compile("[\u4e00-\u9fa5]")
 
+punc = "！？｡。＂＃＄％＆＇（）＊＋，－／：；＜＝＞＠［＼］＾＿｀｛｜｝～｟｠｢｣､、〃》「」『』【】〔〕〖〗〘〙〚〛〜〝〞〟〰〾〿–—‘’‛“”„‟…‧﹏."
+
 
 def is_zh(word):
     global zh_pattern
@@ -533,8 +536,8 @@ def is_zh(word):
     return match is not None
 
 
-class MyConverter(NeutralToneWith5Mixin, DefaultConverter):
-    pass
+# class MyConverter(NeutralToneWith5Mixin, DefaultConverter):
+#     pass
 
 
 @dataclass
@@ -552,7 +555,29 @@ class BakerProcessor(BaseProcessor):
     def setup_eos_token(self):
         return _eos[0]
 
-    def create_items(self):
+    def _create_item_mfa(self):
+        with open(
+            os.path.join(self.data_dir, self.train_f_name), mode="r", encoding="utf-8"
+            ) as f:
+            for line in f:
+                parts = line.strip().split(self.delimiter)
+                utt_id = parts[self.positions["file"]].split("/")[1]
+                wav_path = os.path.join(self.data_dir, parts[self.positions["file"]])
+                wav_path = (
+                    wav_path + self.f_extension
+                    if wav_path[-len(self.f_extension) :] != self.f_extension
+                    else wav_path
+                )
+                text = parts[self.positions["text"]]
+
+                # # remove the eos token
+                # if text.endswith(_eos[0]):
+                #     text = text.replace(_eos[0], '').strip()
+                    
+                speaker_name = parts[self.positions["speaker_name"]]
+                self.items.append([text, wav_path, utt_id, speaker_name])
+
+    def _create_item_non_mfa(self):
         items = []
         if self.data_dir:
             with open(
@@ -572,6 +597,14 @@ class BakerProcessor(BaseProcessor):
                         [" ".join(phonemes), wav_path, utt_id, self.speaker_name]
                     )
             self.items = items
+
+    def create_items(self):
+        if self.mfa:
+            print("Use MFA aligned text")
+            self._create_item_mfa()
+        else:
+            print("Not using MFA aligned text")
+            self._create_item_non_mfa()
 
     def get_phoneme_from_char_and_pinyin(self, chn_char, pinyin):
         # we do not need #4, use sil to replace it
@@ -615,6 +648,7 @@ class BakerProcessor(BaseProcessor):
         if result[-1] == "#0":
             result = result[:-1]
         result.append("sil")
+        print(result)
         assert j == len(pinyin)
         return result
 
@@ -647,18 +681,23 @@ class BakerProcessor(BaseProcessor):
 
         return sample
 
+    # def get_pinyin_parser(self):
+    #     my_pinyin = Pinyin(MyConverter())
+    #     pinyin = my_pinyin.pinyin
+    #     return pinyin
+
     def get_pinyin_parser(self):
-        my_pinyin = Pinyin(MyConverter())
-        pinyin = my_pinyin.pinyin
-        return pinyin
+        model = G2pM()
+        return model
 
     def text_to_sequence(self, text, inference=False):
         if inference:
-            pinyin = self.pinyin_parser(text, style=Style.TONE3, errors="ignore")
+            pinyin = self.pinyin_parser(text, tone=True, char_split=False)
+            # pinyin = self.pinyin_parser(text, style=Style.TONE3, errors="ignore")
             new_pinyin = []
             for x in pinyin:
                 x = "".join(x)
-                if "#" not in x:
+                if "#" not in x and x not in punc:
                     new_pinyin.append(x)
             phonemes = self.get_phoneme_from_char_and_pinyin(text, new_pinyin)
             text = " ".join(phonemes)
@@ -669,6 +708,7 @@ class BakerProcessor(BaseProcessor):
             idx = self.symbol_to_id[symbol]
             sequence.append(idx)
         
-        # add eos tokens
-        sequence += [self.eos_id]
+        if not self.mfa:
+            # add eos tokens
+            sequence += [self.eos_id]
         return sequence
