@@ -1,0 +1,32 @@
+#!/bin/bash
+
+# This doesn't work...
+# ./mfa/montreal-forced-aligner/bin/mfa_generate_dictionary \
+#    ./mfa/montreal-forced-aligner/pretrained_models/mandarin_pinyin_g2p.zip \
+#    /raid/rong.gong/data/tts/baker/wav_lab \
+#    ./mfa/lexicon/baker-lexicon.txt
+
+# ./mfa/montreal-forced-aligner/bin/mfa_validate_dataset \
+#    /raid/rong.gong/data/tts/baker_train \
+#    ./mfa/lexicon/baker-lexicon.txt \
+#    -j 8
+
+# Get MFA alignment
+# ./mfa/montreal-forced-aligner/bin/mfa_train_and_align \
+#    /raid/rong.gong/data/tts/baker_train \
+#    ./mfa/lexicon/baker-lexicon.txt \
+#    ./mfa/textgrid/baker \
+#    -j 8
+
+# /raid/rong.gong/venvs/tf-23/bin/python examples/mfa_extraction/txt_grid_parser.py \
+# 	  --yaml_path examples/fastspeech2_multispeakers/conf/fastspeech2.baker.v2.yaml \
+# 	  --dataset_path  /raid/rong.gong/data/tts/baker_train \
+# 	  --text_grid_path ./mfa/textgrid/baker \
+# 	  --output_durations_path /raid/rong.gong/data/tts/baker_train/durations \
+# 	  --sample_rate 24000 \
+#       --dataset baker
+
+/raid/rong.gong/venvs/tf-23/bin/python examples/mfa_extraction/fix_mismatch.py \
+	  --base_path /raid/rong.gong/data/tts/baker_train/dump_trim_mfa \
+	  --trimmed_dur_path /raid/rong.gong/data/tts/baker_train/trimmed-durations \
+	  --dur_path /raid/rong.gong/data/tts/baker/durations

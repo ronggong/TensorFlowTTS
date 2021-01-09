@@ -42,8 +42,8 @@ dump_baker/
 dump_ljspeech/
 dump_kss/
 dump_libritts/
-/examples/*/*
-!/examples/cppwin/*
+/examples/fastspeech2_libritts/out*
+/examples/fastspeech2_multispeakers/out*
 /examples/cppwin/deps/
-examples/cppwin/UWPTensorflowTTSCpp/
+/examples/cppwin/UWPTensorflowTTSCpp/
 /notebooks/test_saved/
