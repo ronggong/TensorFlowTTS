@@ -648,26 +648,32 @@ class BakerProcessor(BaseProcessor):
         if result[-1] == "#0":
             result = result[:-1]
         result.append("sil")
-        print(result)
         assert j == len(pinyin)
         return result
 
     def get_one_sample(self, item):
         text, wav_file, utt_id, speaker_name = item
 
-        # normalize audio signal to be [-1, 1], soundfile already norm.
-        audio, rate = sf.read(wav_file)
-        audio = audio.astype(np.float32)
-        if rate != self.target_rate:
-            assert rate > self.target_rate
-            audio = librosa.resample(audio, rate, self.target_rate)
-
-        # convert text to ids
         try:
+            # normalize audio signal to be [-1, 1], soundfile already norm.
+            audio, rate = sf.read(wav_file)
+            audio = audio.astype(np.float32)
+            if rate != self.target_rate:
+                assert rate > self.target_rate
+                audio = librosa.resample(audio, rate, self.target_rate)
+
+            # convert text to ids
             text_ids = np.asarray(self.text_to_sequence(text), np.int32)
         except Exception as e:
             print(e, utt_id, text)
-            return None
+            return {
+                "raw_text": text,
+                "text_ids": None,
+                "audio": None,
+                "utt_id": str(int(utt_id)),
+                "speaker_name": speaker_name,
+                "rate": self.target_rate,
+            }
 
         # return None
         sample = {

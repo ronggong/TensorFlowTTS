@@ -188,6 +188,9 @@ def gen_audio_features(item, config):
         f0 (ndarray): fundamental frequency.
         item (Dict): dictionary containing the updated attributes.
     """
+    if item["audio"] is None or item["text_ids"] is None:
+        return False, None, None, None, item
+
     # get info from sample.
     audio = item["audio"]
     utt_id = item["utt_id"]
@@ -399,6 +402,20 @@ def preprocess():
         else {},
     )
 
+    # # Debug code in Baker, the text_to_sequence may not parse some text
+    # for i in processor.items:
+    #     import soundfile as sf
+    #     text = i[0]
+    #     wav_file = i[1]
+    #     utt_id = i[2]
+    #     try:
+    #         audio, rate = sf.read(wav_file)
+    #         text_ids = np.asarray(processor.text_to_sequence(text), np.int32)
+    #     except Exception as e:
+    #         print(e, utt_id, text)
+    #         return None
+    # quit()
+
     # build train test split
     if config["dataset"] == "libritts":
         train_split, valid_split, _, _ = train_test_split(
@@ -487,7 +504,9 @@ def preprocess():
         tqdm(valid_iterator_data, total=len(valid_split), desc="[Preprocessing valid]"),
         chunksize=10,
     )
-    for *_, features in valid_map:
+    for result, *_, features in valid_map:
+        if not result:
+            continue
         save_features_to_file(features, "valid", config)
 
 
