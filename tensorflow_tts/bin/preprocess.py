@@ -147,31 +147,35 @@ def ph_based_trim(
     sil_ph = ["SIL", "END", "sil", "eos"]  # TODO FIX hardcoded values
     text = raw_text.split(" ")
 
-    trim_start, trim_end = False, False
-
-    if text[0] in sil_ph:
-        trim_start = True
-
-    if text[-1] in sil_ph:
-        trim_end = True
-
-    if not trim_start and not trim_end:
+    if not text[0] in sil_ph and not text[-1] in sil_ph:
         return False, text_ids, audio
 
-    idx_start, idx_end = (
-        0 if not trim_start else 1,
-        text_ids.__len__() if not trim_end else -1,
-    )
-    text_ids = text_ids[idx_start:idx_end]
     durations = np.load(os.path.join(duration_path, f"{utt_id}-durations.npy"))
-    if trim_start:
-        s_trim = int(durations[0] * hop_size)
-        audio = audio[s_trim:]
-    if trim_end:
-        e_trim = int(durations[-1] * hop_size)
-        audio = audio[:-e_trim]
+    # iteratively trim all the beginning and trailing silence
+    while (text[0] in sil_ph or text[-1] in sil_ph) and len(text) > 2:
+        trim_start, trim_end = False, False
 
-    durations = durations[idx_start:idx_end]
+        if text[0] in sil_ph:
+            trim_start = True
+
+        if text[-1] in sil_ph:
+            trim_end = True
+
+        idx_start, idx_end = (
+            0 if not trim_start else 1,
+            text_ids.__len__() if not trim_end else -1,
+        )
+        text = text[idx_start:idx_end]
+        text_ids = text_ids[idx_start:idx_end]
+
+        if trim_start:
+            s_trim = int(durations[0] * hop_size)
+            audio = audio[s_trim:]
+        if trim_end:
+            e_trim = int(durations[-1] * hop_size)
+            audio = audio[:-e_trim]
+
+        durations = durations[idx_start:idx_end]
     np.save(os.path.join(duration_fixed_path, f"{utt_id}-durations.npy"), durations)
     return True, text_ids, audio
 
@@ -595,4 +599,4 @@ def compute_statistics():
     save_statistics_to_file(scaler_list, config)
 
 if __name__ == '__main__':
-    normalize()
+    preprocess()

@@ -60,13 +60,13 @@
 # 	  --dur_path /raid/rong.gong/data/tts/baker_train/durations
 
 # phn
-# /raid/rong.gong/venvs/tf-23/bin/python examples/mfa_extraction/fix_mismatch.py \
-# 	  --base_path /raid/rong.gong/data/tts/baker_train_phn/dump_trim_mfa \
-# 	  --trimmed_dur_path /raid/rong.gong/data/tts/baker_train_phn/trimmed-durations \
-# 	  --dur_path /raid/rong.gong/data/tts/baker_train_phn/durations
-
-# phn native textgrid alignment
 /raid/rong.gong/venvs/tf-23/bin/python examples/mfa_extraction/fix_mismatch.py \
-	  --base_path /raid/rong.gong/data/tts/baker_train_phn/dump_trim_native_align \
+	  --base_path /raid/rong.gong/data/tts/baker_train_phn/dump_trim_mfa \
 	  --trimmed_dur_path /raid/rong.gong/data/tts/baker_train_phn/trimmed-durations \
 	  --dur_path /raid/rong.gong/data/tts/baker_train_phn/durations
+
+# # phn native textgrid alignment
+# /raid/rong.gong/venvs/tf-23/bin/python examples/mfa_extraction/fix_mismatch.py \
+# 	  --base_path /raid/rong.gong/data/tts/baker_train_phn/dump_trim_native_align \
+# 	  --trimmed_dur_path /raid/rong.gong/data/tts/baker_train_phn/trimmed-durations \
+# 	  --dur_path /raid/rong.gong/data/tts/baker_train_phn/durations
