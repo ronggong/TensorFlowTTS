@@ -94,6 +94,8 @@ class FastSpeechConfig(object):
             self.vocab_size = len(bk_symbols)
         elif dataset == "libritts":
             self.vocab_size = len(lbri_symbols)
+        elif dataset == "aishell3":
+            self.vocab_size = len(bk_symbols)
         else:
             raise ValueError("No such dataset: {}".format(dataset))
         self.initializer_range = initializer_range

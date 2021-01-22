@@ -48,7 +48,7 @@ class TxtGridParser:
     phone_set_file: str = "phones.txt"
 
     def __post_init__(self):
-        if self.dataset=='baker':
+        if self.dataset=='baker' or self.dataset=='aishell3':
             #self.phones_mapper = {"sil": "sil", "sp": "#0", "spn": "#1", "": "eos"}
             self.phones_mapper = {
                 "sil": "sil",

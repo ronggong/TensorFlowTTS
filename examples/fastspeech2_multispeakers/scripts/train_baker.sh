@@ -16,9 +16,9 @@
 #   --dataset baker > ${outdir}/train.log
 
 dump=/raid/rong.gong/data/tts/baker_train_phn/dump_trim_mfa
-outdir=./examples/fastspeech2_multispeakers/outdir_baker_trim_1gpu_200k_16batch_size_phn
+outdir=./examples/fastspeech2_multispeakers/outdir_baker_trim_end_1gpu_200k_16batch_size_phn
 mkdir -p ${outdir}
-CUDA_VISIBLE_DEVICES=3 python examples/fastspeech2_multispeakers/train_fastspeech2.py \
+CUDA_VISIBLE_DEVICES=1 python examples/fastspeech2_multispeakers/train_fastspeech2.py \
   --train-dir $dump/train/ \
   --dev-dir $dump/valid/ \
   --outdir  ${outdir}\

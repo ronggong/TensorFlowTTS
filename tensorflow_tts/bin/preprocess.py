@@ -32,6 +32,7 @@ from tqdm import tqdm
 
 from tensorflow_tts.processor import LJSpeechProcessor
 from tensorflow_tts.processor import BakerProcessor
+from tensorflow_tts.processor import Aishell3Processor
 from tensorflow_tts.processor import KSSProcessor
 from tensorflow_tts.processor import LibriTTSProcessor
 from tensorflow_tts.processor import ThorstenProcessor
@@ -71,7 +72,7 @@ def parse_and_config():
         "--dataset",
         type=str,
         default="ljspeech",
-        choices=["ljspeech", "kss", "libritts", "baker", "thorsten"],
+        choices=["ljspeech", "kss", "libritts", "baker", "thorsten", "aishell3"],
         help="Dataset to preprocess.",
     )
     parser.add_argument(
@@ -202,7 +203,9 @@ def gen_audio_features(item, config):
 
     # check audio properties
     assert len(audio.shape) == 1, f"{utt_id} seems to be multi-channel signal."
-    assert np.abs(audio).max() <= 1.0, f"{utt_id} is different from 16 bit PCM."
+    if np.abs(audio).max() > 1.0:
+        print(f"{utt_id} has magnitude max value {np.abs(audio).max()}")
+    #assert np.abs(audio).max() <= 1.0, f"{utt_id} is different from 16 bit PCM."
     
     # check sample rate
     if rate != config["sampling_rate"]:
@@ -364,6 +367,7 @@ def preprocess():
         "libritts": LibriTTSProcessor,
         "baker": BakerProcessor,
         "thorsten": ThorstenProcessor,
+        "aishell3": Aishell3Processor
     }
 
     dataset_symbol = {
@@ -372,6 +376,7 @@ def preprocess():
         "libritts": LIBRITTS_SYMBOLS,
         "baker": BAKER_SYMBOLS,
         "thorsten": THORSTEN_SYMBOLS,
+        "aishell3": BAKER_SYMBOLS,
     }
 
     dataset_cleaner = {
@@ -380,6 +385,7 @@ def preprocess():
         "libritts": None,
         "baker": None,
         "thorsten": "german_cleaners",
+        "aishell3": None,
     }
 
     logging.info(f"Selected '{config['dataset']}' processor.")
@@ -402,7 +408,7 @@ def preprocess():
     processor._save_mapper(
         os.path.join(config["outdir"], f"{config['dataset']}_mapper.json"),
         extra_attrs_to_save={"pinyin_dict": processor.pinyin_dict}
-        if config["dataset"] == "baker"
+        if config["dataset"] == "baker" or config["dataset"] == "aishell3"
         else {},
     )
 
@@ -421,7 +427,7 @@ def preprocess():
     # quit()
 
     # build train test split
-    if config["dataset"] == "libritts":
+    if config["dataset"] == "libritts" or config["dataset"] == "aishell3":
         train_split, valid_split, _, _ = train_test_split(
             processor.items,
             [i[-1] for i in processor.items],
@@ -599,4 +605,4 @@ def compute_statistics():
     save_statistics_to_file(scaler_list, config)
 
 if __name__ == '__main__':
-    preprocess()
+    normalize()
