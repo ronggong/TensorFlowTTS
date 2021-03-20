@@ -3,14 +3,17 @@ import os
 import shutil
 import click
 import soundfile as sf
+import librosa
 from tqdm import tqdm
 from pathlib import Path
+from multiprocessing import Pool
+from functools import partial
 from mandarin_utils import PINYIN_DICT, is_zh
 
 def select_speakers(dataset_path,
                     max_speakers=100,
                     min_len=20,
-                    max_file_len=15,
+                    max_file_len=20,
                     min_file_len=2):
     """Select speakers of which the audio length longer than the min_len
 
@@ -50,22 +53,62 @@ def select_speakers(dataset_path,
 
     return poss_speakers, to_move
 
+def copy_audio_file(item, sample_rate=24000):
+    j, to_path = item
+    wav = sf.SoundFile(j)
+    if wav.samplerate != sample_rate:
+        audio = wav.read()
+        audio = librosa.resample(audio, wav.samplerate, sample_rate)
+        sf.write(to_path, audio, sample_rate, 'PCM_16')
+    else:
+        shutil.copy(j, to_path)
+    return True
+
 def copy_audio_files(poss_speakers,
                      to_move,
-                     output_path):
-    """Copy selected speakers wav to output path
+                     output_path,
+                     sample_rate,
+                     n_cpus=8):
 
-    Args:
-        output_path (str): path to save the wav
+    def selected_files(poss_speakers,
+                       to_move,
+                       output_path):
+        """Yield selected speakers wav and output path
 
-    Returns:
-    """
+        Args:
+            output_path (str): path to save the wav
+
+        Returns:
+        """
+        for sp_id, v in poss_speakers.items():
+            if sp_id in to_move:
+                for j in v:
+                    f_name = os.path.basename(j)
+                    to_path = os.path.join(output_path, sp_id, f_name)
+                    yield j, to_path
+    
+    files_to_copy = selected_files(poss_speakers, to_move, output_path)
+
+    num_files = 0
     for sp_id, v in poss_speakers.items():
+        os.makedirs(os.path.join(output_path, sp_id), exist_ok=True)
         if sp_id in to_move:
-            for j in v:
-                f_name = os.path.basename(j)
-                os.makedirs(os.path.join(output_path, sp_id), exist_ok=True)
-                shutil.copy(j, os.path.join(output_path, sp_id, f_name))
+            for _ in v:
+                num_files += 1
+
+    p = Pool(n_cpus)
+
+    # preprocess train files and get statistics for normalizing
+    partial_fn = partial(copy_audio_file, sample_rate=sample_rate)
+    copy_map = p.imap_unordered(
+        partial_fn,
+        tqdm(files_to_copy, total=num_files, desc="[Copy files and resampling]"),
+        chunksize=10,
+    )
+    for result in copy_map:
+        if not result:
+            raise RuntimeError("Things wrong when copying data.")
+
 
 pinyin_dict = PINYIN_DICT
 def get_phoneme_from_char_and_pinyin(chn_char, pinyin):
@@ -96,7 +139,16 @@ def get_phoneme_from_char_and_pinyin(chn_char, pinyin):
 def parse_copy_transcript(transcript,
                           poss_speakers,
                           to_move,
-                          output_path):
+                          output_path,
+                          min_phn_len=4):
+    """Parse the transcription txt and copy to lab
+    for MFA alignment
+
+    Args:
+        output_path (str): path to save the wav
+
+    Returns:
+    """
 
     dict_spk_bn = {}
     for spk in poss_speakers:
@@ -123,29 +175,41 @@ def parse_copy_transcript(transcript,
             #     print(f"Skip this: {utt_id} {chn_char} {pinyin}")
             #     continue
             phonemes = get_phoneme_from_char_and_pinyin(chn_char, pinyin)
-            text = " ".join(phonemes)
-            with open(os.path.join(output_path, utt_id[:7], utt_id+".lab"), "w") as lab:
-                lab.write(text)
+            if len(phonemes) > min_phn_len:
+                text = " ".join(phonemes)
+                with open(os.path.join(output_path, utt_id[:7], utt_id+".lab"), "w") as lab:
+                    lab.write(text)
+            else:
+                print(f"{utt_id} has a phn length shorter than f{min_phn_len}")
 
 @click.command()
 @click.option("--dataset_path", default="dataset", type=str, help="Dataset directory")
 @click.option("--output_path", default="dataset/output", type=str, help="Organized dataset directory")
 @click.option("--transcript", type=str, help="Transcription file")
-@click.option("--max_speakers", default=100, type=int, help="Max chosen speakers")
-@click.option("--min_len", default=20, type=float, help="Minimum length for each speaker (min)")
+@click.option("--max_speakers", default=50, type=int, help="Max chosen speakers")
+@click.option("--min_len", default=25, type=float, help="Minimum length for each speaker (min)")
+@click.option("--sample_rate", default=24000, type=int, help="Target sample rate")
+@click.option("--n_cpus", default=8, type=int, help="gpu number when copying")
 def main(
     dataset_path: str,
     output_path: str,
     transcript: str,
     max_speakers: int,
     min_len: float,
+    sample_rate: int,
+    n_cpus: int
 ):
+    # select speakers
     poss_speakers, to_move = \
         select_speakers(dataset_path,
                         max_speakers,
                         min_len)
 
-    # copy_audio_files(poss_speakers, to_move, output_path)
+    # copy_audio_files(poss_speakers,
+    #     to_move, 
+    #     output_path,
+    #     sample_rate,
+    #     n_cpus)
 
     parse_copy_transcript(transcript,
                           poss_speakers,

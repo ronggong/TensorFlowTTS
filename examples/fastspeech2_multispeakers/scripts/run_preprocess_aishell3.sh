@@ -6,7 +6,11 @@ datadir=/raid/rong.gong/data/tts/aishell
 # python3 examples/fastspeech2_multispeakers/scripts/prepare_aishell3.py \
 #     --dataset_path ${datadir}/AISHELL-3/train/wav/ \
 #     --output_path ${datadir}/organized_data/wav_lab \
-#     --transcript ${datadir}/AISHELL-3/train/label_train-set.txt
+#     --transcript ${datadir}/AISHELL-3/train/label_train-set.txt \
+# 	--max_speakers 50 \
+# 	--min_len 20 \
+# 	--sample_rate 24000 \
+# 	--n_cpus 8
 
 
 datadir=/raid/rong.gong/data/tts/aishell/organized_data

@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Create training file and durations from textgrids for LibriTTS dataset
-add punctuations in the train.txt"""
+add punctuations with 0 duration in the train.txt"""
 
 import os
 from dataclasses import dataclass
@@ -135,18 +135,16 @@ class TxtGridParser:
                             tokens = tokens[r[1]:]
                         if r[0] is not None:
                             # Punct found
-                            mark = r[0]
+                            punct = r[0]
+                            durations.append(0)
+                            phs.append(punct)
                     else:
                         r = (None, None)
 
-                    if r[0] is None:
-                        # Mark is a sil, and we can't find any punct in the text
-                        mark = self.phones_mapper[mark]
-                        if mark == "END":
-                            assert iterator == pha.intervals.__len__() - 1
-                            # check if empty ph is always last example in your dataset if not fix it
-                            if phs[-1] == 'SIL':
-                                phs[-1] = '.'   
+                    # Mark is a sil, and we can't find any punct in the text
+                    mark = self.phones_mapper[mark]
+                    if mark == "END":
+                        assert iterator == pha.intervals.__len__() - 1
 
                 dur = interval.duration() * (self.sample_rate / self.hop_size)
                 durations.append(round(dur))

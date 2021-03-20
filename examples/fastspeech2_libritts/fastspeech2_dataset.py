@@ -40,6 +40,34 @@ def tf_average_by_duration(x, durs):
     return outs
 
 
+def dataset_bucket_by_sequence_length(
+    dataset,
+    batch_size,
+    padded_shapes,
+    bucket_max_len,
+    bucket_min_len,
+    bucket_nsteps=20):
+
+    step = (bucket_max_len - bucket_min_len) // bucket_nsteps
+    boundaries = np.arange(bucket_min_len, bucket_max_len, step, np.int32)
+    batch_sizes = [1] * (len(boundaries) + 1)
+    for i, bound in enumerate(boundaries):
+        batch_sizes[i] = batch_size // bound
+    batch_sizes[-1] = batch_size // boundaries[-1]
+
+    dataset = dataset.apply(
+        tf.data.experimental.bucket_by_sequence_length(
+            lambda items: items['mel_lengths'],
+            boundaries,
+            batch_sizes,
+            padded_shapes=padded_shapes,
+            drop_remainder=False,
+            pad_to_bucket_boundary=False)
+        )
+        
+    return dataset
+
+
 class CharactorDurationF0EnergyMelDataset(AbstractDataset):
     """Tensorflow Charactor Duration F0 Energy Mel dataset."""
 
@@ -59,7 +87,7 @@ class CharactorDurationF0EnergyMelDataset(AbstractDataset):
         f0_load_fn=np.load,
         energy_load_fn=np.load,
         mel_length_threshold=0,
-        speakers_map=None
+        speakers_map=None,
     ):
         """Initialize dataset.
 
@@ -194,6 +222,10 @@ class CharactorDurationF0EnergyMelDataset(AbstractDataset):
         is_shuffle=False,
         map_fn=None,
         reshuffle_each_iteration=True,
+        bucket_by_length=False,
+        bucket_max_len=-1,
+        bucket_min_len=-1,
+        bucket_nsteps=-1,
     ):
         """Create tf.dataset function."""
         output_types = self.get_output_dtypes()
@@ -231,9 +263,19 @@ class CharactorDurationF0EnergyMelDataset(AbstractDataset):
             "mel_lengths": [],
         }
 
-        datasets = datasets.padded_batch(
-            batch_size, padded_shapes=padded_shapes, drop_remainder=True
-        )
+        if bucket_by_length:
+            datasets = dataset_bucket_by_sequence_length(
+                datasets,
+                batch_size,
+                padded_shapes,
+                bucket_max_len,
+                bucket_min_len,
+                bucket_nsteps=bucket_nsteps,
+            )
+        else:
+            datasets = datasets.padded_batch(
+                batch_size, padded_shapes=padded_shapes, drop_remainder=True
+            )
         datasets = datasets.prefetch(tf.data.experimental.AUTOTUNE)
         return datasets
 

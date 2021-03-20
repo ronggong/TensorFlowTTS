@@ -398,7 +398,29 @@ def main():
         batch_size=config["batch_size"]
         * STRATEGY.num_replicas_in_sync
         * config["gradient_accumulation_steps"],
+        bucket_by_length=config["bucket_by_length"],
+        bucket_max_len=config["bucket_max_len"],
+        bucket_min_len=config["bucket_min_len"],
+        bucket_nsteps=config["bucket_nsteps"],
     )
+
+    #### debug code ###
+    #maxl, minl = 0, 99999
+    #for i, items in enumerate(train_dataset):
+    #    max_length = max(items["mel_lengths"])
+    #    min_length = min(items["mel_lengths"])
+    #    tf.print(min_length, max_length)
+    #    if max_length > maxl:
+    #        maxl = max_length
+    #    if min_length < minl:
+    #        minl = min_length
+    #    if i % 5 == 0:
+    #        print(f"processed {i} batches.")
+
+    #tf.print(minl)
+    #tf.print(maxl)
+    #tf.print('One epoch finished')
+    #### debug code finished ###
 
     valid_dataset = CharactorDurationF0EnergyMelDataset(
         root_dir=args.dev_dir,
@@ -415,6 +437,10 @@ def main():
         is_shuffle=config["is_shuffle"],
         allow_cache=config["allow_cache"],
         batch_size=config["batch_size"] * STRATEGY.num_replicas_in_sync,
+        bucket_by_length=config["bucket_by_length"],
+        bucket_max_len=config["bucket_max_len"],
+        bucket_min_len=config["bucket_min_len"],
+        bucket_nsteps=config["bucket_nsteps"],
     )
 
     # define trainer

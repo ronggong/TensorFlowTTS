@@ -38,7 +38,7 @@ for i in os.listdir(subset_path):
                     sf_file =  sf.SoundFile(f_path)
                     dur = len(sf_file) / sf_file.samplerate
                     if max_file_len < dur or dur < min_file_len:
-                        print(dur)
+                        #print(dur)
                         continue
                     else:
                         id_included.append(f_path)

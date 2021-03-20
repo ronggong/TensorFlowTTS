@@ -122,6 +122,8 @@ class CharactorDurationF0EnergyMelDataset(AbstractDataset):
         self.speakers_map = speakers_map
         if dataset=='baker':
             self.speakers = [list(self.speakers_map.values())[0]] * len(self.utt_ids)
+        elif dataset=='aishell3':
+            self.speakers = [self.speakers_map[i[:7]] for i in self.utt_ids]
         else:
             self.speakers = [self.speakers_map[i.split("_")[0]] for i in self.utt_ids]
         print("Speaker: utt_id", list(zip(self.speakers, self.utt_ids)))

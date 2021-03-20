@@ -24,7 +24,7 @@ import re
 from tensorflow_tts.utils.korean import tokenize as ko_tokenize
 from tensorflow_tts.utils.number_norm import normalize_numbers
 from unidecode import unidecode
-from german_transliterate.core import GermanTransliterate
+# from german_transliterate.core import GermanTransliterate
 
 # Regular expression matching whitespace:
 _whitespace_re = re.compile(r"\s+")

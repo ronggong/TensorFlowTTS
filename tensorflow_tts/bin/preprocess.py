@@ -556,7 +556,9 @@ def normalize():
         raise ValueError("'npy' is the only supported format.")
 
     # find all "raw-feats" files in both train and valid folders
-    glob_path = os.path.join(config["rootdir"], "**", "raw-feats", "*.npy")
+    # a hack to set outdir == rootdir, to put preprocess() and normalize() in the same process
+    # glob_path = os.path.join(config["rootdir"], "**", "raw-feats", "*.npy")
+    glob_path = os.path.join(config["outdir"], "**", "raw-feats", "*.npy")
     mel_raw_feats = glob.glob(glob_path, recursive=True)
     logging.info(f"Files to normalize: {len(mel_raw_feats)}")
 
@@ -605,4 +607,5 @@ def compute_statistics():
     save_statistics_to_file(scaler_list, config)
 
 if __name__ == '__main__':
+    preprocess()
     normalize()
